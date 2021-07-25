@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CommonLibraries.Core.Extensions;
-using CommonLibraries.WebApiPack;
+using CommonLibraries.Web;
 using QuotesService.DAL;
 
 namespace QuotesService.WebApi
@@ -24,6 +24,16 @@ namespace QuotesService.WebApi
 
         protected override void ConfigurePipelineAfterMvc(IApplicationBuilder app)
         {
+        }
+
+        protected override void ConfigureRoutes(IApplicationBuilder app)
+        {
+
+        }
+
+        protected override void ConfigureApplication(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            ConfigureWebApi(app, env);
         }
 
         protected override void ConfigureServiceCollections(IServiceCollection services)

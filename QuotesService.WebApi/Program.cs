@@ -1,4 +1,4 @@
-using CommonLibraries.WebApiPack;
+using CommonLibraries.Web;
 
 namespace QuotesService.WebApi
 {
