@@ -1,0 +1,21 @@
+﻿using System;
+
+namespace QuotesService.Api.Models
+{
+    public class QuoteModel
+    {
+        //public TickerInfoModel ParentTickerTF { get; set; }
+
+        public DateTime Date { get; set; }
+
+        public decimal Open { get; set; }
+
+        public decimal Hi { get; set; }
+
+        public decimal Low { get; set; }
+
+        public decimal Close { get; set; }
+
+        public decimal Volume { get; set; }
+    }
+}

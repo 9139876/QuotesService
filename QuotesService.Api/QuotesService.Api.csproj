@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommonLibraries.Core" Version="1.0.0" />
+    <PackageReference Include="CommonLibraries.RemoteCall" Version="1.0.6" />
+  </ItemGroup>
+
+  <Target Name="CopyPackage" AfterTargets="Pack">
+    <Copy SourceFiles="bin\$(Configuration)\$(PackageId).$(PackageVersion).nupkg" DestinationFolder="C:\GitHub\Nugets" />
+  </Target>
+
+</Project>
