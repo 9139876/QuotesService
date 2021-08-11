@@ -1,0 +1,200 @@
+﻿@{
+	Layout = null;
+}
+
+<div id="quotesGetterApp" class="container">
+	<div class="border">
+
+		<h4>Выбор рынка</h4>
+		<form class="row g-3">
+			<div class="col-md-8">
+				<select class="form-select form-select-lg" v-model="currentMarketName">
+					<option v-for="item in markets.map(x=>x.marketName)">
+						{{item}}
+					</option>
+				</select>
+			</div>
+
+			<div class="col-md-1">
+				<button type="button" class="btn btn-primary" data-bs-toggle="modal"
+					data-bs-target="#addMarketModal">Добавить</button>
+			</div>
+
+			<div class="col-md-1" v-if="currentMarketName?.length > 0">
+				<button type="button" class="btn btn-primary" data-bs-toggle="modal"
+					data-bs-target="#deleteMarketModal">Удалить</button>
+			</div>
+		</form>
+
+		<h4>Выбор инструмента</h4>
+		<form class="row g-3">
+			<div class="col-md-8">
+				<select class="form-select form-select-lg" v-model="currentTickerName">
+					<option v-for="item in currentMarketTickers">
+						{{item}}
+					</option>
+				</select>
+			</div>
+
+			<div class="col-md-1" v-if="currentMarketName?.length > 0">
+				<button type="button" class="btn btn-primary" data-bs-toggle="modal"
+					data-bs-target="#addTickerModal">Добавить</button>
+			</div>
+
+			<div class="col-md-1" v-if="currentTickerName?.length > 0">
+				<button type="button" class="btn btn-primary" data-bs-toggle="modal"
+					data-bs-target="#deleteTickerModal">Удалить</button>
+			</div>
+		</form>
+
+		<template v-if="currentTickerName?.length > 0">
+
+			<h4>Информация об инструменте</h4>
+			<form class="row g-3">
+				<div class="col-md-1" v-if="currentMarketName?.length > 0">
+					<button type="button" class="btn btn-primary" data-bs-toggle="modal"
+						data-bs-target="#addTickerModal">Просмотр</button>
+				</div>
+
+				<div class="col-md-1" v-if="currentMarketName?.length > 0">
+					<button type="button" class="btn btn-primary" data-bs-toggle="modal"
+						data-bs-target="#addTickerModal">Редактирование</button>
+				</div>
+			</form>
+
+			<h4>Информация о котировках</h4>
+			<form class="row g-3">
+				<div class="col-md-1" v-if="currentMarketName?.length > 0">
+					<button type="button" class="btn btn-primary" data-bs-toggle="modal"
+						data-bs-target="#addTickerModal">Просмотр</button>
+				</div>
+			</form>
+
+			<h4>Настройка автоматического получения котировок</h4>
+			<form class="row g-3">
+				<div class="col-md-1" v-if="currentMarketName?.length > 0">
+					<button type="button" class="btn btn-primary" data-bs-toggle="modal"
+						data-bs-target="#addTickerModal">Просмотр</button>
+				</div>
+
+				<div class="col-md-1" v-if="currentMarketName?.length > 0">
+					<button type="button" class="btn btn-primary" data-bs-toggle="modal"
+						data-bs-target="#addTickerModal">Редактирование</button>
+				</div>
+			</form>
+
+			<h4>Загрузка котировок из файла</h4>
+			<form class="row g-3">
+				<div class="col-md-1" v-if="currentMarketName?.length > 0">
+					<button type="button" class="btn btn-primary" data-bs-toggle="modal"
+						data-bs-target="#addTickerModal">Загрузить</button>
+				</div>
+			</form>
+
+		</template>
+	</div>
+
+	<!-- #region Modal Add Market-->
+	<div class="modal fade" id="addMarketModal" tabindex="-1" data-bs-backdrop="static">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Добавление рынка</h5>
+				</div>
+				<div class="modal-body">
+					<label for="addedMarketNameInput" class="form-label">Название рынка</label>
+					<input type="text" class="form-control" id="addedMarketNameInput" v-model="addedMarketName">
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+						v-on:click="addMarket()">Добавить</button>
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- #endregion -->
+
+	<!-- #region Modal Delete Market-->
+	<div class="modal fade" id="deleteMarketModal" tabindex="-1" data-bs-backdrop="static">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Удаление рынка</h5>
+				</div>
+				<div class="modal-body">
+					<h6>Вы уверены, что хотите удалить рынок {{currentMarketName}}?</h6>
+					<div v-if="currentMarketTickers.length > 0">Будут также удалены следующие инструменты:</div>
+					<div v-for="intem in currentMarketTickers">
+						- {{intem}}
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-danger" data-bs-dismiss="modal"
+						v-on:click="deleteMarket()">Удалить</button>
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- #endregion -->
+
+	<!-- #region Modal Add Ticker-->
+	<div class="modal fade" id="addTickerModal" tabindex="-1" data-bs-backdrop="static">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Добавление инструмента</h5>
+				</div>
+				<div class="modal-body">
+					<label for="addedTickerNameInput" class="form-label">Название инструмента</label>
+					<input type="text" class="form-control" id="addedTickerNameInput" v-model="addedTickerName">
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+						v-on:click="addTicker()">Добавить</button>
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- #endregion -->
+
+	<!-- #region Modal Delete Ticker-->
+	<div class="modal fade" id="deleteTickerModal" tabindex="-1" data-bs-backdrop="static">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Удаление инструмента</h5>
+				</div>
+				<div class="modal-body">
+					<h6>Вы уверены, что хотите удалить инструмент {{currentTickerName}}?</h6>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-danger" data-bs-dismiss="modal"
+						v-on:click="deleteTicker()">Удалить</button>
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- #endregion -->
+
+</div>
+
+
+
+<script>
+	const getMarketsUrl = '/quotes-getter-api/get-markets';
+	const addMarketUrl = '/quotes-getter-api/add-market';
+	const deleteMarketUrl = '/quotes-getter-api/delete-market';
+	const addTickerUrl = '/quotes-getter-api/add-ticker';
+	const deleteTickerUrl = '/quotes-getter-api/delete-ticker';
+</script>
+
+<link rel="stylesheet" href="~/css/bootstrap.min.css" asp-append-version="true" />
+
+<script src="~/js/lib/axios.min.js" asp-append-version="true"></script>
+<script src="~/js/lib/vue.min.js" asp-append-version="true"></script>
+<script src="~/js/lib/bootstrap.min.js" asp-append-version="true"></script>
+<script src="~/js/quotesGetterScript.js" asp-append-version="true"></script>

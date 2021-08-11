@@ -3,7 +3,7 @@ using QuotesService.DAL.Entities;
 
 namespace QuotesService.DAL.Repositories
 {
-    public interface ITickerInfoEntityRepository : IBaseRepository<TickerInfoEntity>
+    public interface ITickerTFsRepository : IBaseRepository<TickerTFEntity>
     {
     }
 }

@@ -14,10 +14,10 @@ namespace QuotesService.WebApi.Controllers
     [ApiController]
     public class SetDataController
     {
-        private readonly IMarketEntityRepository _marketEntityRepository;
+        private readonly IMarketsRepository _marketEntityRepository;
 
         public SetDataController(
-            IMarketEntityRepository marketEntityRepository)
+            IMarketsRepository marketEntityRepository)
         {
             _marketEntityRepository = marketEntityRepository;
         }
@@ -28,21 +28,20 @@ namespace QuotesService.WebApi.Controllers
         {
             request.RequiredNotNull(nameof(request));
 
-            var existingMarket = await _marketEntityRepository.GetByQuotesProviderAndName(request.QuotesProvider, request.MarketName);
+            var existingMarket = (await _marketEntityRepository.GetAllMarketsNames()).FirstOrDefault(x => x == request.MarketName);
 
             if (existingMarket != null)
             {
                 return new AddMarketResponse()
                 {
                     IsSuccess = false,
-                    Message = $"Рынок {request.MarketName} уже существует для {request.QuotesProvider.ToString()}"
+                    Message = $"Рынок с именем {request.MarketName} уже существует"
                 };
             }
 
             var marketEntity = new MarketEntity()
             {
-                Name = request.MarketName,
-                QuotesProvider = request.QuotesProvider
+                Name = request.MarketName
             };
 
             await _marketEntityRepository.InsertAsync(marketEntity);

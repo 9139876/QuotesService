@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommonLibraries.Web" Version="1.0.3" />
+    <PackageReference Include="CommonLibraries.Web" Version="1.0.5" />
   </ItemGroup>
 
   <ItemGroup>
@@ -18,10 +18,13 @@
     <Content Update="C:\Users\Andrew\.nuget\packages\commonlibraries.web\1.0.3\contentFiles\any\net5.0\nlog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Update="C:\Users\Andrew\.nuget\packages\commonlibraries.web\1.0.5\contentFiles\any\net5.0\nlog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\" />
+    <ProjectReference Include="..\QuotesService.BL\QuotesService.BL.csproj" />
   </ItemGroup>
 
 </Project>

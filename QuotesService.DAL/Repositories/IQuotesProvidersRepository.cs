@@ -5,7 +5,7 @@ using QuotesService.DAL.Entities;
 
 namespace QuotesService.DAL.Repositories
 {
-    public interface IQuotesProviderEntityRepository : IBaseRepository<QuotesProviderEntity>
+    public interface IQuotesProvidersRepository : IBaseRepository<QuotesProviderEntity>
     {
         List<QuotesProviderEntity> GetAllQuotesProviders();
 

@@ -18,11 +18,11 @@ namespace QuotesService.WebApi.Controllers
     public class GetDataController
     {
         private readonly IStrategyService _strategyService;
-        private readonly IMarketEntityRepository _marketEntityRepository;
+        private readonly IMarketsRepository _marketEntityRepository;
 
         public GetDataController(
             IStrategyService strategyService,
-            IMarketEntityRepository marketEntityRepository)
+            IMarketsRepository marketEntityRepository)
         {
             _strategyService = strategyService;
             _marketEntityRepository = marketEntityRepository;
@@ -39,15 +39,11 @@ namespace QuotesService.WebApi.Controllers
             return await service.CheckGetQuotes(request);
         }
 
-        [HttpPost]
-        [Route("get-markets-names")]
-        public async Task<List<string>> GetMarketsNames([FromBody] GetMarketsNamesRequest request)
+        [HttpGet]
+        [Route("get-all-markets-names")]
+        public async Task<List<string>> GetAllMarketsNames()
         {
-            request.RequiredNotNull(nameof(request));
-
-            return (await _marketEntityRepository.GetQuotesProviderMarkets(request.QuotesProvider))
-                .Select(x => x.Name)
-                .ToList();
+            return await _marketEntityRepository.GetAllMarketsNames();
         }
     }
 }

@@ -31,7 +31,7 @@ namespace QuotesService.GUI.Forms
             Cmb_QuotesProviders.Items.AddRange(Enum.GetNames(typeof(QuotesProviderEnum)));
         }
 
-        private async void Cmb_QuotesProviders_SelectedIndexChanged(object sender, EventArgs e)
+        private void Cmb_QuotesProviders_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (Cmb_QuotesProviders.SelectedItem != null)
             {
@@ -49,13 +49,8 @@ namespace QuotesService.GUI.Forms
         {
             var quotesProviderType = (QuotesProviderEnum)Enum.Parse(typeof(QuotesProviderEnum), Cmb_QuotesProviders.SelectedItem.ToString());
 
-            var getMarketsNamesRequest = new GetMarketsNamesRequest()
-            {
-                QuotesProvider = quotesProviderType
-            };
-
-            var markets = await _getDataRemoteCallService.GetMarketsNames(getMarketsNamesRequest);
-            markets.RequiredNotNull(nameof(markets), getMarketsNamesRequest);
+            var markets = await _getDataRemoteCallService.GetAllMarketsNames();
+            markets.RequiredNotNull(nameof(markets));
 
             new AddTickerWindow(quotesProviderType, markets).ShowDialog();
         }
@@ -71,8 +66,7 @@ namespace QuotesService.GUI.Forms
             {
                 var addMarketRequest = new AddMarketRequest()
                 {
-                    MarketName = marketName,
-                    QuotesProvider = (QuotesProviderEnum)Enum.Parse(typeof(QuotesProviderEnum), Cmb_QuotesProviders.SelectedItem.ToString())
+                    MarketName = marketName
                 };
 
                 var addMarketResult = await _setDataRemoteCallService.AddMarket(addMarketRequest);
@@ -80,7 +74,7 @@ namespace QuotesService.GUI.Forms
 
                 if (addMarketResult.IsSuccess)
                 {
-                    MessageBox.Show($"Рынок {marketName} успешно добавлен для {Cmb_QuotesProviders.SelectedItem.ToString()}");
+                    MessageBox.Show($"Рынок {marketName} успешно добавлен");
                 }
                 else
                 {

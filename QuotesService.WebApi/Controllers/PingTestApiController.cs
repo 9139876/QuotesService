@@ -16,7 +16,7 @@ namespace QuotesService.WebApi.Controllers
 
         [HttpGet]
         [Route("api/ping-test/get")]
-        public async Task<string> Get()
+        public string Get()
         {
             return _pingTestService.PingKey;
         }

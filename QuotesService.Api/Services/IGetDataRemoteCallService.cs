@@ -13,6 +13,6 @@ namespace QuotesService.Api.Services
     {
         Task<CheckGetQuotesResponse> CheckGetQuotes(CheckGetQuotesRequest request);
 
-        Task<List<string>> GetMarketsNames(GetMarketsNamesRequest request);
+        Task<List<string>> GetAllMarketsNames();
     }
 }

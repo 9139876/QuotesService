@@ -23,7 +23,7 @@ namespace QuotesService.Api.Services.Implementation
         public async Task<CheckGetQuotesResponse> CheckGetQuotes(CheckGetQuotesRequest request)
             => await ExecutePostAsync<CheckGetQuotesResponse, CheckGetQuotesRequest>("api/get/quotes-check", request);
 
-        public async Task<List<string>> GetMarketsNames(GetMarketsNamesRequest request)
-            => await ExecutePostAsync<List<string>, GetMarketsNamesRequest>("api/get/get-markets-names", request);
+        public async Task<List<string>> GetAllMarketsNames()
+            => await ExecuteGetAsync<List<string>>("api/get/get-markets-names");
     }
 }

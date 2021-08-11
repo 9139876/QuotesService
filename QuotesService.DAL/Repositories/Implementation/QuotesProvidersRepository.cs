@@ -8,11 +8,11 @@ using QuotesService.DAL.Internal;
 
 namespace QuotesService.DAL.Repositories.Implementation
 {
-    internal class QuotesProviderEntityRepository : BaseRepository<QuotesProviderEntity>, IQuotesProviderEntityRepository
+    internal class QuotesProvidersRepository : BaseRepository<QuotesProviderEntity>, IQuotesProvidersRepository
     {
-        private readonly IMarketsDbContext _dbcontext;
+        private readonly IQuotesDbContext _dbcontext;
 
-        public QuotesProviderEntityRepository(IMarketsDbContext dbcontext) : base(dbcontext.QuotesProviderEntity)
+        public QuotesProvidersRepository(IQuotesDbContext dbcontext) : base(dbcontext.QuotesProviders)
         {
             _dbcontext = dbcontext;
         }

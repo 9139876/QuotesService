@@ -12,8 +12,8 @@ namespace QuotesService.DAL.Entities
     /// <summary>
     /// Поддерживаемые поставщиком котировок таймфреймы
     /// </summary>
-    [Table("QuotesProvidersTimeFrames")]
-    public class QuotesProvidersTimeFramesEntity
+    [Table("QuotesProvidersTFs")]
+    public class QuotesProviderTFEntity
     {
         [Key]
         public int Id { get; set; }

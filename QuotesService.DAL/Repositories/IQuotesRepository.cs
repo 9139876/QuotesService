@@ -3,7 +3,7 @@ using QuotesService.DAL.Entities;
 
 namespace QuotesService.DAL.Repositories
 {
-    public interface IQuoteEntityRepository : IBaseRepository<QuoteEntity>
+    public interface IQuotesRepository : IBaseRepository<QuoteEntity>
     {
     }
 }

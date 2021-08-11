@@ -10,8 +10,8 @@ namespace QuotesService.DAL.Entities
         [Key]
         public int Id { get; set; }
 
-        public QuotesProviderEnum QuotesProvider { get; set; }
-
         public string Name { get; set; }
+
+        //Время работы и т.д.
     }
 }

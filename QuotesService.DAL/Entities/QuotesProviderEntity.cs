@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using QuotesService.Api.Enum;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace QuotesService.DAL.Entities
@@ -8,6 +9,8 @@ namespace QuotesService.DAL.Entities
     {
         [Key]
         public int Id { get; set; }
+
+        public QuotesProviderEnum QuotesProviderType { get; set; }
 
         public string Name { get; set; }
     }

@@ -6,19 +6,13 @@ using QuotesService.Api.Enum;
 namespace QuotesService.DAL.Entities
 {
     [Table("TickersTFs")]
-    public class TickersTimeFramesEntity
+    public class TickerTFEntity
     {
         [Key]
         public int Id { get; set; }
 
-        public int TickerInfoId { get; set; }
+        public int TickerId { get; set; }
 
         public TimeFrameEnum TimeFrame { get; set; }
-
-        //public string GetUrl { get; set; }
-
-        //public bool NeedUpdate { get; set; }
-
-        //public DateTime? NextUpdateDate { get; set; }
     }
 }

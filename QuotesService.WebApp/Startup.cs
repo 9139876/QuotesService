@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CommonLibraries.Web;
+using CommonLibraries.Core.Extensions;
+using QuotesService.DAL;
 
 namespace QuotesService.WebApp
 {
@@ -20,7 +22,11 @@ namespace QuotesService.WebApp
 
         protected override void ConfigureServiceCollections(IServiceCollection services)
         {
+            services.RegisterDbContexts(Configuration);
 
+            services.RegisterAssemblyServiceAndRepositoryByMember<BL.PlaceboRegistration>();
+            services.RegisterAssemblyServiceAndRepositoryByMember<DAL.PlaceboRegistration>();
+            services.RegisterAssemblyServiceAndRepositoryByMember<Startup>();
         }
 
         protected override void ConfigurePipelineAfterExceptionsHandling(IApplicationBuilder app)
@@ -39,7 +45,8 @@ namespace QuotesService.WebApp
                 {
                     endpoints.MapControllerRoute(
                         name: "default",
-                        pattern: "{controller=Home}/{action=Index}/{id?}");
+                        //pattern: "{controller=Home}/{action=Index}/{id?}");
+                        pattern: "{controller=QuotesGetter}/{action=Main}/{id?}");
                 });
         }
     }

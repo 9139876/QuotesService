@@ -15,7 +15,7 @@ namespace QuotesService.DAL
     {
         public static void RegisterDbContexts(this IServiceCollection services, IConfiguration configuration)
         {
-            services.RegisterDbContext<IMarketsDbContext, MarketsDbContext>(() => configuration.GetConnectionString("MarketsDb"));
+            services.RegisterDbContext<IQuotesDbContext, QuotesDbContext>(() => configuration.GetConnectionString("QuotesDb"));
         }
     }
 }
