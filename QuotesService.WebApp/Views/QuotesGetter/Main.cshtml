@@ -51,20 +51,20 @@
 
 			<h4>Информация об инструменте</h4>
 			<form class="row g-3">
-				<div class="col-md-1" v-if="currentMarketName?.length > 0">
+				<div class="col-md-1">
 					<button type="button" class="btn btn-primary" data-bs-toggle="modal"
-						data-bs-target="#addTickerModal">Просмотр</button>
+						data-bs-target="#tickerInfoViewModal" v-on:click="getTickerInfo()">Просмотр</button>
 				</div>
 
-				<div class="col-md-1" v-if="currentMarketName?.length > 0">
+				<div class="col-md-1">
 					<button type="button" class="btn btn-primary" data-bs-toggle="modal"
-						data-bs-target="#addTickerModal">Редактирование</button>
+						data-bs-target="#tickerInfoEditModal" v-on:click="getTickerInfo()">Редактирование</button>
 				</div>
 			</form>
 
 			<h4>Информация о котировках</h4>
 			<form class="row g-3">
-				<div class="col-md-1" v-if="currentMarketName?.length > 0">
+				<div class="col-md-1">
 					<button type="button" class="btn btn-primary" data-bs-toggle="modal"
 						data-bs-target="#addTickerModal">Просмотр</button>
 				</div>
@@ -72,12 +72,12 @@
 
 			<h4>Настройка автоматического получения котировок</h4>
 			<form class="row g-3">
-				<div class="col-md-1" v-if="currentMarketName?.length > 0">
+				<div class="col-md-1">
 					<button type="button" class="btn btn-primary" data-bs-toggle="modal"
 						data-bs-target="#addTickerModal">Просмотр</button>
 				</div>
 
-				<div class="col-md-1" v-if="currentMarketName?.length > 0">
+				<div class="col-md-1">
 					<button type="button" class="btn btn-primary" data-bs-toggle="modal"
 						data-bs-target="#addTickerModal">Редактирование</button>
 				</div>
@@ -85,7 +85,7 @@
 
 			<h4>Загрузка котировок из файла</h4>
 			<form class="row g-3">
-				<div class="col-md-1" v-if="currentMarketName?.length > 0">
+				<div class="col-md-1">
 					<button type="button" class="btn btn-primary" data-bs-toggle="modal"
 						data-bs-target="#addTickerModal">Загрузить</button>
 				</div>
@@ -180,6 +180,52 @@
 	</div>
 	<!-- #endregion -->
 
+	<!-- #region Modal Ticker info view-->
+	<div class="modal fade" id="tickerInfoViewModal" tabindex="-1" data-bs-backdrop="static">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Информация об инструменте</h5>
+				</div>
+				<div class="modal-body" v-for="item in currentTickerInfo?.properties">
+					<div><strong>{{item.name}}</strong></div>
+					<div class="border">{{item.value}}</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- #endregion -->
+
+	<!-- #region Modal Ticker info edit-->
+	<div class="modal fade" id="tickerInfoEditModal" tabindex="-1" data-bs-backdrop="static">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Информация об инструменте - редактирование</h5>
+				</div>
+				<div class="modal-body" v-for="item in currentTickerInfo?.properties">
+					<div v-if="item.readOnly === true">
+						<div><strong>{{item.name}}</strong></div>
+						<div class="border">{{item.value}}</div>
+					</div>
+					<div v-else>
+						<label for="addedMarketNameInput" class="form-label"><strong>{{item.name}}</strong></label>
+						<input type="text" class="form-control" id="addedMarketNameInput" v-model="item.value">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+						v-on:click="setTickerInfo()">Сохранить</button>
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- #endregion -->
+
 </div>
 
 
@@ -190,6 +236,8 @@
 	const deleteMarketUrl = '/quotes-getter-api/delete-market';
 	const addTickerUrl = '/quotes-getter-api/add-ticker';
 	const deleteTickerUrl = '/quotes-getter-api/delete-ticker';
+	const getTickerInfoUrl = '/quotes-getter-api/get-ticker-info';
+	const setTickerInfoUrl = '/quotes-getter-api/set-ticker-info';
 </script>
 
 <link rel="stylesheet" href="~/css/bootstrap.min.css" asp-append-version="true" />

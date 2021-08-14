@@ -6,7 +6,14 @@
         currentTickerName: '',
         addedMarketName: '',
         addedTickerName: '',
-        testVar: 0
+        currentTickerInfo: {}
+    },
+    watch:{
+        currentMarketName: function(newValue){
+            const vue = this;
+
+            vue.currentTickerName = '';
+        }
     },
     computed: {
         currentMarketTickers: function () {
@@ -126,7 +133,7 @@
                 return;
             }
 
-            if (vue.currentTickerName?.length > 0 === false) {                
+            if (vue.currentTickerName?.length > 0 === false) {
                 return;
             }
 
@@ -150,5 +157,60 @@
                     alert(error);
                 });
         },
+        getTickerInfo: function () {
+            const vue = this;
+
+            if (vue.currentMarketName?.length > 0 === false) {
+                alert('Рынок не выбран!');
+                return;
+            }
+
+            if (vue.currentTickerName?.length > 0 === false) {
+                alert('Инструмент не выбран!');
+                return;
+            }
+
+            let request = {};
+            request.marketName = vue.currentMarketName;
+            request.tickerName = vue.currentTickerName;
+
+            vue.currentTickerInfo = {};
+
+            axios
+                .post(getTickerInfoUrl, request)
+                .then(response => {
+                    if (response.data?.status?.isSuccess === true) {
+                        vue.currentTickerInfo = response.data;
+                    }
+                    else {
+                        alert('Ошибка: ' + response.data?.status?.message ?? 'неизвестная ошибка сервера');
+                    }
+                })
+                .catch(error => {
+                    alert(error);
+                });
+        },
+        setTickerInfo: function (){
+            const vue = this;
+
+            if(vue.currentTickerInfo.properties?.length > 0 === false){
+                alert('Параметры инструмента не загружены');
+                return;
+            }
+
+            axios
+                .post(setTickerInfoUrl, vue.currentTickerInfo.properties)
+                .then(response => {
+                    if (response.data?.isSuccess === true) {
+                        alert('Изменения успешно сохранены');
+                    }
+                    else {
+                        alert('Ошибка: ' + response.data?.message ?? 'неизвестная ошибка сервера');
+                    }
+                })
+                .catch(error => {
+                    alert(error);
+                });
+        }
     }
 });
