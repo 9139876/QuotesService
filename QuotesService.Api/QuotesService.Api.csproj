@@ -9,6 +9,10 @@
     <PackageReference Include="CommonLibraries.RemoteCall" Version="1.0.6" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\Implementation\" />
+  </ItemGroup>
+
   <Target Name="CopyPackage" AfterTargets="Pack">
     <Copy SourceFiles="bin\$(Configuration)\$(PackageId).$(PackageVersion).nupkg" DestinationFolder="C:\GitHub\Nugets" />
   </Target>

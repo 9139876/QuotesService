@@ -8,8 +8,8 @@
         addedTickerName: '',
         currentTickerInfo: {}
     },
-    watch:{
-        currentMarketName: function(newValue){
+    watch: {
+        currentMarketName: function (newValue) {
             const vue = this;
 
             vue.currentTickerName = '';
@@ -190,10 +190,10 @@
                     alert(error);
                 });
         },
-        setTickerInfo: function (){
+        setTickerInfo: function () {
             const vue = this;
 
-            if(vue.currentTickerInfo.properties?.length > 0 === false){
+            if (vue.currentTickerInfo.properties?.length > 0 === false) {
                 alert('Параметры инструмента не загружены');
                 return;
             }
@@ -211,6 +211,15 @@
                 .catch(error => {
                     alert(error);
                 });
+        },
+        goToLoadFromFile: function () {
+            const vue = this;
+
+            let sp = new URLSearchParams();
+            sp.append('marketName', vue.currentMarketName);
+            sp.append('tickerName', vue.currentTickerName);
+
+            document.location.href = 'http://localhost:53299/LoadFromFile/Main?' + sp.toString();
         }
     }
 });

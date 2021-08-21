@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QuotesService.BL.Services
+namespace QuotesService.BL.Models
 {
-    public interface IFileLoaderService
+    public class YahooFinanceGetDataInfoModel
     {
-        Task<string> GetFileTextAsync(string fileName);
+        public string Symbol { get; set; }
     }
 }

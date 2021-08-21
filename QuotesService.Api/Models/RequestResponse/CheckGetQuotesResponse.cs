@@ -7,7 +7,7 @@ using CommonLibraries.Core.Base;
 
 namespace QuotesService.Api.Models.RequestResponse
 {
-    public class CheckGetQuotesResponse : BaseGuidResponse
+    public class CheckGetQuotesResponse
     {
         public bool IsSuccess { get; set; }
 

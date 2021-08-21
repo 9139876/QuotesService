@@ -21,9 +21,15 @@ namespace QuotesService.Api.Services.Implementation
         protected override string _apiSchemeAndHostConfigKey { get; set; } = "QuotesService.Api.SchemeAndHost";
 
         public async Task<CheckGetQuotesResponse> CheckGetQuotes(CheckGetQuotesRequest request)
-            => await ExecutePostAsync<CheckGetQuotesResponse, CheckGetQuotesRequest>("api/get/quotes-check", request);
+            => await ExecutePostAsync<CheckGetQuotesResponse, CheckGetQuotesRequest>("api/quotes-provider/check-get-quotes", request);
 
-        public async Task<List<string>> GetAllMarketsNames()
-            => await ExecuteGetAsync<List<string>>("api/get/get-markets-names");
+        public async Task<GetQuotesResponse> GetQuotes(GetQuotesRequest request)
+            => await ExecutePostAsync<GetQuotesResponse, GetQuotesRequest>("api/quotes-provider/get-quotes", request);
+
+        public async Task<List<KeyValuePair<string, string>>> GetQuotesProviderParameters(GetQuotesProviderParametersRequest request)
+        => await ExecutePostAsync<List<KeyValuePair<string, string>>, GetQuotesProviderParametersRequest>("api/quotes-provider/get-quotes-privider-parameters", request);
+
+        public async Task<StandartResponse> SetQuotesProviderParameters(SetQuotesProviderParametersRequest request)
+        => await ExecutePostAsync<StandartResponse, SetQuotesProviderParametersRequest>("api/quotes-provider/set-quotes-privider-parameters", request);
     }
 }

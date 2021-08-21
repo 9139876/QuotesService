@@ -8,12 +8,12 @@ using QuotesService.Api.Enum;
 
 namespace QuotesService.Api.Models.RequestResponse
 {
-    public class CheckGetQuotesRequest : BaseGuidRequest
+    public class CheckGetQuotesRequest
     {
         public QuotesProviderEnum QuotesProvider { get; set; }
 
-        public string Symbol { get; set; }
-
         public DateTime StartDate { get; set; }
+
+        public List<KeyValuePair<string, string>> Parameters { get; set; } = new List<KeyValuePair<string, string>>();
     }
 }

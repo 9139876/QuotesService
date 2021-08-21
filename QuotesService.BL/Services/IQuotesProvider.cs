@@ -12,5 +12,9 @@ namespace QuotesService.BL.Services
         Task<GetQuotesResponse> GetQuotes(GetQuotesRequest request);
 
         Task<CheckGetQuotesResponse> CheckGetQuotes(CheckGetQuotesRequest request);
+
+        Task<List<KeyValuePair<string, string>>> GetQuotesProviderParameters(GetQuotesProviderParametersRequest request);
+
+        Task<StandartResponse> SetQuotesProviderParameters(SetQuotesProviderParametersRequest request);
     }
 }

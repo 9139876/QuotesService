@@ -24,7 +24,6 @@ namespace QuotesService.WebApp
         {
             services.RegisterDbContexts(Configuration);
 
-            services.RegisterAssemblyServiceAndRepositoryByMember<BL.PlaceboRegistration>();
             services.RegisterAssemblyServiceAndRepositoryByMember<DAL.PlaceboRegistration>();
             services.RegisterAssemblyServiceAndRepositoryByMember<Startup>();
         }
@@ -45,8 +44,8 @@ namespace QuotesService.WebApp
                 {
                     endpoints.MapControllerRoute(
                         name: "default",
-                        //pattern: "{controller=Home}/{action=Index}/{id?}");
-                        pattern: "{controller=QuotesGetter}/{action=Main}/{id?}");
+                        pattern: "{controller=Home}/{action=Index}/{id?}");
+                        //pattern: "{controller=QuotesGetter}/{action=Main}/{id?}");
                 });
         }
     }

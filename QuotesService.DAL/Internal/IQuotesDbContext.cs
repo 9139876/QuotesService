@@ -18,6 +18,10 @@ namespace QuotesService.DAL.Internal
 
         DbSet<TickerEntity> Tickers { get; set; }
 
+        DbSet<TickerInfoEntity> TickersInfoes { get; set; }
+
+        DbSet<TickerInfoNameEntity> TickersInfoesNames { get; set; }
+
         DbSet<TickerTFEntity> TickerTFs { get; set; }
     }
 }

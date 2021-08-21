@@ -4,8 +4,6 @@ namespace QuotesService.Api.Models
 {
     public class QuoteModel
     {
-        //public TickerInfoModel ParentTickerTF { get; set; }
-
         public DateTime Date { get; set; }
 
         public decimal Open { get; set; }

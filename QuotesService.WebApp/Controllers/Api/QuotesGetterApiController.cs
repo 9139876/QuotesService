@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using QuotesService.Api.Enum;
 using QuotesService.Api.Models.RequestResponse;
-using QuotesService.BL.Services;
 using QuotesService.DAL.Entities;
+using QuotesService.DAL.Internal;
 using QuotesService.DAL.Models;
 using QuotesService.DAL.Repositories;
 using QuotesService.WebApp.Models;
@@ -20,18 +20,27 @@ namespace QuotesService.WebApp.Controllers.Api
     [Route("quotes-getter-api")]
     public class QuotesGetterApiController : Controller
     {
-        private const string _marketFieldName = "MarketName";
-        private const string _tickerFieldName = "TickerName";
-
         private readonly IMarketsRepository _marketsRepository;
         private readonly ITickersRepository _tickersRepository;
+        private readonly ITickersInfoesRepository _tickersInfoesRepository;
+        private readonly ITickersInfoesNamesRepository _tickersInfoesNamesRepository;
+        private readonly ITickerTFsRepository _tickerTFsRepository;
+        private readonly IQuotesDbContext _quotesDbContext;
 
         public QuotesGetterApiController(
             IMarketsRepository marketsRepository,
-            ITickersRepository tickersRepository)
+            ITickersRepository tickersRepository,
+            ITickersInfoesRepository tickersInfoesRepository,
+            ITickersInfoesNamesRepository tickersInfoesNamesRepository,
+            ITickerTFsRepository tickerTFsRepository,
+            IQuotesDbContext quotesDbContext)
         {
             _marketsRepository = marketsRepository;
             _tickersRepository = tickersRepository;
+            _tickersInfoesRepository = tickersInfoesRepository;
+            _tickersInfoesNamesRepository = tickersInfoesNamesRepository;
+            _tickerTFsRepository = tickerTFsRepository;
+            _quotesDbContext = quotesDbContext;
         }
 
         [HttpGet("get-markets")]
@@ -51,8 +60,6 @@ namespace QuotesService.WebApp.Controllers.Api
             {
                 dict[ticker.MarketId].TickersNames.Add(ticker.Name);
             }
-
-            ///!!! добавить тикер инфо
 
             return dict.Values.ToList();
         }
@@ -149,15 +156,34 @@ namespace QuotesService.WebApp.Controllers.Api
                 };
             }
 
-            var newTicker = new DAL.Entities.TickerEntity()
+            var newTicker = new TickerEntity()
             {
                 Name = request.TickerName,
                 MarketId = existingMarket.Id
             };
 
-            await _tickersRepository.InsertAsync(newTicker);
+            using (var transaction = _quotesDbContext.BeginTransaction())
+            {
+                await _tickersRepository.InsertAsync(newTicker);
 
-            return new StandartResponse() { IsSuccess = true };
+                foreach (TimeFrameEnum tf in Enum.GetValues(typeof(TimeFrameEnum)))
+                {
+                    var ttf = new TickerTFEntity()
+                    {
+                        TickerId = newTicker.Id,
+                        TimeFrame = tf
+                    };
+
+                    await _tickerTFsRepository.InsertAsync(ttf);
+                }
+
+                transaction.Commit();
+            }
+
+            return new StandartResponse()
+            {
+                IsSuccess = true
+            };
         }
 
         [HttpPost("delete-ticker")]
@@ -191,115 +217,89 @@ namespace QuotesService.WebApp.Controllers.Api
         }
 
         [HttpPost("get-ticker-info")]
-        public async Task<GetTickerInfoResponse> GetTickerInfo([FromBody] TickerAndMarketRequest request)
+        public async Task<TickerInfoResponse> GetTickerInfo([FromBody] TickerAndMarketRequest request)
         {
             request.RequiredNotNull(nameof(request));
 
-            var result = new GetTickerInfoResponse()
-            {
-                Status = new StandartResponse()
-                {
-                    IsSuccess = false
-                }
-            };
-
             if (string.IsNullOrEmpty(request.MarketName) || string.IsNullOrEmpty(request.TickerName))
             {
-                result.Status.Message = $"Имя {(string.IsNullOrEmpty(request.MarketName) ? "рынка" : "инструмента") } не может быть пустым";
-                return result;
+                return new TickerInfoResponse()
+                {
+                    Status = new StandartResponse()
+                    {
+                        IsSuccess = false,
+                        Message = $"Имя {(string.IsNullOrEmpty(request.MarketName) ? "рынка" : "инструмента") } не может быть пустым"
+                    }
+                };
             }
 
             var existingTicker = await _tickersRepository.GetByTickerAndMarket(request);
 
             if (existingTicker == null)
             {
-                result.Status.Message = $"Инструмент {request.TickerName} для рынка {request.MarketName} не существует";
-                return result;
+                return new TickerInfoResponse()
+                {
+                    Status = new StandartResponse()
+                    {
+                        IsSuccess = false,
+                        Message = $"Инструмент {request.TickerName} для рынка {request.MarketName} не существует"
+                    }
+                };
             }
 
-            result.Status.IsSuccess = true;
+            var names = await _tickersInfoesNamesRepository.GetAllNames();
 
-            result.Properties.Add(new TickerInfoProperty
+            var properties = (await _tickersInfoesRepository.GetTickerInfoesByTickerId(existingTicker.Id))
+                .Where(x => names.Contains(x.KeyName))
+                .ToList();
+
+            foreach (var name in names.Where(x => properties.Select(x => x.KeyName).Contains(x) == false))
             {
-                FieldName = nameof(existingTicker.Symbol),
-                Name = "Код",
-                Value = existingTicker.Symbol,
-                ReadOnly = false
-            });
+                properties.Add(new TickerInfoEntity()
+                {
+                    TickerId = existingTicker.Id,
+                    KeyName = name,
+                    Value = null
+                });
+            }
 
-            result.Properties.Add(new TickerInfoProperty
+            var result = new TickerInfoResponse()
             {
-                FieldName = _tickerFieldName,
-                Name = "Название",
-                Value = request.TickerName,
-                ReadOnly = true
-            });
-
-            result.Properties.Add(new TickerInfoProperty
-            {
-                FieldName = _marketFieldName,
-                Name = "Рынок",
-                Value = request.MarketName,
-                ReadOnly = true
-            });
-
-            result.Properties.Add(new TickerInfoProperty
-            {
-                FieldName = nameof(existingTicker.Type),
-                Name = "Тип",
-                Value = existingTicker.Type,
-                ReadOnly = false
-            });
-
-            result.Properties.Add(new TickerInfoProperty
-            {
-                FieldName = nameof(existingTicker.Description),
-                Name = "Описание",
-                Value = existingTicker.Description,
-                ReadOnly = false
-            });
-
-            result.Properties.Add(new TickerInfoProperty
-            {
-                FieldName = nameof(existingTicker.Currency),
-                Name = "Валюта",
-                Value = existingTicker.Currency,
-                ReadOnly = false
-            });
-
-            result.Properties.Add(new TickerInfoProperty
-            {
-                FieldName = nameof(existingTicker.VolumeCode),
-                Name = "Единица измерения",
-                Value = existingTicker.VolumeCode,
-                ReadOnly = false
-            });
-
+                MarketName = request.MarketName,
+                TickerName = request.TickerName,
+                Status = new StandartResponse()
+                {
+                    IsSuccess = true
+                },
+                Properties = properties.Select(x => new TickerInfoProperty()
+                {
+                    Name = x.KeyName,
+                    Value = x.Value,
+                    ReadOnly = false
+                }).ToList()
+            };
 
             return result;
         }
 
         [HttpPost("set-ticker-info")]
-        public async Task<StandartResponse> SetTickerInfo([FromBody] List<TickerInfoProperty> properties)
+        public async Task<StandartResponse> SetTickerInfo([FromBody] TickerInfoResponse tickerInfo)
         {
-            properties.RequiredNotNull(nameof(properties));
+            tickerInfo.RequiredNotNull(nameof(tickerInfo));
 
-            var marketName = properties.FirstOrDefault(x => x.FieldName == _marketFieldName)?.Value;
-            var tickerName = properties.FirstOrDefault(x => x.FieldName == _tickerFieldName)?.Value;
-
-            if (string.IsNullOrEmpty(marketName) || string.IsNullOrEmpty(tickerName))
+            if (string.IsNullOrEmpty(tickerInfo.MarketName) || string.IsNullOrEmpty(tickerInfo.TickerName))
             {
                 return new StandartResponse()
                 {
                     IsSuccess = false,
-                    Message = $"Имя {(string.IsNullOrEmpty(marketName) ? "рынка" : "инструмента") } не может быть пустым"
+                    Message = $"Имя {(string.IsNullOrEmpty(tickerInfo.MarketName) ? "рынка" : "инструмента") } не может быть пустым"
                 };
             }
 
             var existingTicker = await _tickersRepository.GetByTickerAndMarket(new TickerAndMarketRequest()
             {
-                MarketName = marketName,
-                TickerName = tickerName
+                MarketName = tickerInfo.MarketName,
+                TickerName = tickerInfo.TickerName
             });
 
             if (existingTicker == null)
@@ -307,27 +307,59 @@ namespace QuotesService.WebApp.Controllers.Api
                 return new StandartResponse()
                 {
                     IsSuccess = false,
-                    Message = $"Инструмент {tickerName} для рынка {marketName} не существует"
+                    Message = $"Инструмент {tickerInfo.TickerName} для рынка {tickerInfo.MarketName} не существует"
                 };
             }
 
-            foreach (var property in properties.Where(x => x.ReadOnly == false))
-            {
-                var propertyInfo = existingTicker.GetType().GetProperty(property.FieldName);
-               
-                if(propertyInfo == null)
-                {
-                    return new StandartResponse()
-                    {
-                        IsSuccess = false,
-                        Message = $"Неизвестное свойство - '{property.FieldName}'"
-                    };
-                }
+            var names = await _tickersInfoesNamesRepository.GetAllNames();
 
-                propertyInfo.SetValue(existingTicker, property.Value);
+            var existingProperties = await _tickersInfoesRepository.GetTickerInfoesByTickerId(existingTicker.Id);
+
+            var forDelete = existingProperties.Where(x => names.Contains(x.KeyName) == false).ToList();
+
+            var forInsert = new List<TickerInfoEntity>();
+            var forUpdate = new List<TickerInfoEntity>();
+
+            foreach (var name in names)
+            {
+                var newValue = tickerInfo.Properties.SingleOrDefault(x => x.Name == name);
+
+                if (newValue != null)
+                {
+                    var oldValue = existingProperties.SingleOrDefault(x => x.KeyName == name);
+
+                    if (oldValue == null)
+                    {
+                        forInsert.Add(new TickerInfoEntity()
+                        {
+
+                        });
+                    }
+                    else if (newValue.Value != oldValue.Value)
+                    {
+                        oldValue.Value = newValue.Value;
+                        forUpdate.Add(oldValue);
+                    }
+                }
             }
 
-            await _tickersRepository.UpdateAsync(existingTicker);
+            using (var transaction = _quotesDbContext.BeginTransaction())
+            {
+                foreach (var del in forDelete)
+                {
+                    await _tickersInfoesRepository.DeleteAsync(del);
+                }
+
+                foreach (var ins in forInsert)
+                {
+                    await _tickersInfoesRepository.InsertAsync(ins);
+                }
+
+                foreach (var upd in forUpdate)
+                {
+                    await _tickersInfoesRepository.UpdateAsync(upd);
+                }
+            }
 
             return new StandartResponse() { IsSuccess = true };
         }

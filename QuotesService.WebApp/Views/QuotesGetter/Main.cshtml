@@ -5,10 +5,11 @@
 <div id="quotesGetterApp" class="container">
 	<div class="border">
 
-		<h4>Выбор рынка</h4>
+		<h4>Рынок</h4>
 		<form class="row g-3">
 			<div class="col-md-8">
 				<select class="form-select form-select-lg" v-model="currentMarketName">
+					<option disabled value="">Выбор рынка</option>
 					<option v-for="item in markets.map(x=>x.marketName)">
 						{{item}}
 					</option>
@@ -26,10 +27,11 @@
 			</div>
 		</form>
 
-		<h4>Выбор инструмента</h4>
+		<h4>Инструмент</h4>
 		<form class="row g-3">
 			<div class="col-md-8">
 				<select class="form-select form-select-lg" v-model="currentTickerName">
+					<option disabled value="">Выбор инструмента</option>
 					<option v-for="item in currentMarketTickers">
 						{{item}}
 					</option>
@@ -51,12 +53,12 @@
 
 			<h4>Информация об инструменте</h4>
 			<form class="row g-3">
-				<div class="col-md-1">
+				<div class="col-md-2">
 					<button type="button" class="btn btn-primary" data-bs-toggle="modal"
 						data-bs-target="#tickerInfoViewModal" v-on:click="getTickerInfo()">Просмотр</button>
 				</div>
 
-				<div class="col-md-1">
+				<div class="col-md-2">
 					<button type="button" class="btn btn-primary" data-bs-toggle="modal"
 						data-bs-target="#tickerInfoEditModal" v-on:click="getTickerInfo()">Редактирование</button>
 				</div>
@@ -64,7 +66,7 @@
 
 			<h4>Информация о котировках</h4>
 			<form class="row g-3">
-				<div class="col-md-1">
+				<div class="col-md-2">
 					<button type="button" class="btn btn-primary" data-bs-toggle="modal"
 						data-bs-target="#addTickerModal">Просмотр</button>
 				</div>
@@ -72,22 +74,23 @@
 
 			<h4>Настройка автоматического получения котировок</h4>
 			<form class="row g-3">
-				<div class="col-md-1">
+				<div class="col-md-2">
 					<button type="button" class="btn btn-primary" data-bs-toggle="modal"
-						data-bs-target="#addTickerModal">Просмотр</button>
+						data-bs-target="#addTickerModal">Параметры</button>
 				</div>
 
-				<div class="col-md-1">
+				<div class="col-md-2">
 					<button type="button" class="btn btn-primary" data-bs-toggle="modal"
-						data-bs-target="#addTickerModal">Редактирование</button>
+						data-bs-target="#addTickerModal">Расписания</button>
 				</div>
 			</form>
 
 			<h4>Загрузка котировок из файла</h4>
 			<form class="row g-3">
-				<div class="col-md-1">
-					<button type="button" class="btn btn-primary" data-bs-toggle="modal"
-						data-bs-target="#addTickerModal">Загрузить</button>
+				<div class="col-md-2">
+					@* <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+						data-bs-target="#addTickerModal">Загрузить</button> *@
+					<button type="button" class="btn btn-primary" v-on:click="goToLoadFromFile()">Загрузить</button>
 				</div>
 			</form>
 
@@ -227,8 +230,6 @@
 	<!-- #endregion -->
 
 </div>
-
-
 
 <script>
 	const getMarketsUrl = '/quotes-getter-api/get-markets';

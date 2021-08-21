@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CommonLibraries.EF.Implementation;
 using Microsoft.EntityFrameworkCore;
+using QuotesService.Api.Enum;
 using QuotesService.DAL.Entities;
 using QuotesService.DAL.Internal;
 
@@ -17,14 +18,24 @@ namespace QuotesService.DAL.Repositories.Implementation
             _dbcontext = dbcontext;
         }
 
-        public List<QuotesProviderEntity> GetAllQuotesProviders()
+        public async Task<List<QuotesProviderEntity>> GetAllQuotesProviders()
         {
-            return DbSet.ToList();
+            return await DbSet.ToListAsync();
+        }
+
+        public async Task<QuotesProviderEntity> GetQuotesProviderById(int id)
+        {
+            return await DbSet.SingleOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<QuotesProviderEntity> GetQuotesProviderByName(string name)
         {
             return await DbSet.SingleOrDefaultAsync(x => x.Name == name);
+        }
+
+        public async Task<QuotesProviderEntity> GetQuotesProviderByType(QuotesProviderEnum quotesProvider)
+        {
+            return await DbSet.SingleOrDefaultAsync(x => x.QuotesProviderType == quotesProvider);
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using QuotesService.BL.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,8 +9,11 @@ namespace QuotesService.WebApp.Controllers
 {
     public class LoadFromFileController : Controller
     {
-        public IActionResult Main()
+        public IActionResult Main(string marketName, string tickerName)
         {
+            ViewBag.MarketName = marketName ?? "Unknown market";
+            ViewBag.TickerName = tickerName ?? "Unknown ticker";
+
             return View();
         }
     }

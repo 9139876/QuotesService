@@ -9,6 +9,5 @@ namespace QuotesService.BL.Services
 {
     public interface IYahooFinanceService : IQuotesProvider
     {
-        Task<TryGetTickerInfoYFFromServerResponse> TryGetTickerInfoFromServerAsync(TryGetTickerInfoYFFromServerRequest request);
     }
 }

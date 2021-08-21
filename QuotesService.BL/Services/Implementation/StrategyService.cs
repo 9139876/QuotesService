@@ -19,16 +19,16 @@ namespace QuotesService.BL.Services.Implementation
 
         public IQuotesProvider GetInstance(QuotesProviderEnum type)
         {
-            switch (type)
+            return type switch
             {
-                case QuotesProviderEnum.YahooFinance: return _yahooFinanceService;
-                case QuotesProviderEnum.AlphaVantage: throw new NotImplementedException();
-                case QuotesProviderEnum.Finam: throw new NotImplementedException();
-                case QuotesProviderEnum.Finnhub: throw new NotImplementedException();
-                case QuotesProviderEnum.Stooq: throw new NotImplementedException();
-
-                default: throw new NotSupportedException($"Неизвестный тип поставщика котировок - {type.ToString()}");
-            }
+                QuotesProviderEnum.YahooFinance => _yahooFinanceService,
+                QuotesProviderEnum.AlphaVantage => throw new NotImplementedException(),
+                QuotesProviderEnum.Finam => throw new NotImplementedException(),
+                QuotesProviderEnum.Finnhub => throw new NotImplementedException(),
+                QuotesProviderEnum.Stooq => throw new NotImplementedException(),
+                
+                _ => throw new NotSupportedException($"Неизвестный тип поставщика котировок - {type.ToString()}"),
+            };
         }
     }
 }

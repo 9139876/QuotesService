@@ -8,9 +8,13 @@ using QuotesService.Api.Enum;
 
 namespace QuotesService.Api.Models.RequestResponse
 {
-    public class GetQuotesRequest : BaseGuidRequest
+    public class GetQuotesRequest
     {
-        public string Symbol { get; set; }
+        public QuotesProviderEnum QuotesProvider { get; set; }
+
+        public string TickerName { get; set; }
+
+        public string MarketName { get; set; }
 
         public TimeFrameEnum TimeFrame { get; set; }
 

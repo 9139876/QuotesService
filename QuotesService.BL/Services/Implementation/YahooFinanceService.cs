@@ -6,36 +6,140 @@ using System.Net;
 using System.Resources;
 using System.Text;
 using System.Threading.Tasks;
+using CommonLibraries.Core.Extensions;
 using Newtonsoft.Json.Linq;
 using QuotesService.Api.Enum;
 using QuotesService.Api.Models;
 using QuotesService.Api.Models.RequestResponse;
+using QuotesService.BL.Models;
+using QuotesService.BL.Static;
+using QuotesService.DAL.Entities;
+using QuotesService.DAL.Repositories;
 
 namespace QuotesService.BL.Services.Implementation
 {
     internal class YahooFinanceService : IYahooFinanceService
     {
-        public async Task<TryGetTickerInfoYFFromServerResponse> TryGetTickerInfoFromServerAsync(TryGetTickerInfoYFFromServerRequest request)
+        private static readonly DateTime _zeroDt = new DateTime(1970, 1, 1);
+        private readonly ITickersRepository _tickersRepository;
+        private readonly IQuotesProvidersRepository _quotesProvidersRepository;
+
+        public YahooFinanceService(
+            ITickersRepository tickersRepository,
+            IQuotesProvidersRepository quotesProvidersRepository)
         {
-            var response = new TryGetTickerInfoYFFromServerResponse() { GUID = request.GUID };
-
-            var url = $"https://finance.yahoo.com/quote/{request.Code.ToUpper()}/profile?p={request.Code.ToUpper()}";
-
-            var webClient = new WebClient();
-            System.IO.Stream stream = webClient.OpenRead(url);
-            using (var reader = new System.IO.StreamReader(stream))
-            {
-                response.Data = await reader.ReadToEndAsync();
-            }
-
-            return response;
+            _tickersRepository = tickersRepository;
+            _quotesProvidersRepository = quotesProvidersRepository;
         }
 
         public async Task<GetQuotesResponse> GetQuotes(GetQuotesRequest request)
         {
-            var response = new GetQuotesResponse() { GUID = request.GUID };
+            var ticker = await GetTicker(request.TickerName, request.MarketName);
 
-            var url = GetQuotesURL(request.Symbol, request.StartDate, request.EndDate, request.TimeFrame);
+            var getDataInfo = ticker.ProviderGetDataInfo?.Deserialize<YahooFinanceGetDataInfoModel>();
+
+            if (getDataInfo == null)
+            {
+                throw new InvalidOperationException($"Ticker not have {nameof(getDataInfo)} - {ticker.Serialize()}");
+            }
+
+            var url = GetQuotesURL(getDataInfo.Symbol, request.StartDate, request.EndDate, request.TimeFrame);
+
+            return await GetQuotes(url);
+        }
+
+        public async Task<CheckGetQuotesResponse> CheckGetQuotes(CheckGetQuotesRequest request)
+        {
+            try
+            {
+                if (request.Parameters.Where(x => x.Key == nameof(YahooFinanceGetDataInfoModel.Symbol)).Any() == false)
+                {
+                    throw new InvalidOperationException();
+                }
+
+                var symbol = request.Parameters.Single(x => x.Key == nameof(YahooFinanceGetDataInfoModel.Symbol)).Value;
+
+                var url = GetQuotesURL(symbol, request.StartDate, request.StartDate.AddMonths(1), TimeFrameEnum.D1);
+
+                var quotes = await GetQuotes(url);
+
+                if (quotes.Quotes.Any())
+                {
+                    return new CheckGetQuotesResponse()
+                    {
+                        IsSuccess = true,
+                        StartDate = quotes.Quotes.Select(x => x.Date).Min()
+                    };
+                }
+                else
+                {
+                    return new CheckGetQuotesResponse()
+                    {
+                        IsSuccess = false,
+                        ErrorMessage = $"Для начальной даты {request.StartDate.ToString("d")} в течение месяца не было ни одной котировки"
+                    };
+                }
+            }
+            catch (Exception e)
+            {
+                return new CheckGetQuotesResponse()
+                {
+                    IsSuccess = false,
+                    ErrorMessage = e.Message
+                };
+            }
+        }
+
+        public async Task<List<KeyValuePair<string, string>>> GetQuotesProviderParameters(GetQuotesProviderParametersRequest request)
+        {
+            var ticker = await GetTicker(request.TickerName, request.MarketName);
+
+            var getDataInfo = ticker.ProviderGetDataInfo?.Deserialize<YahooFinanceGetDataInfoModel>() ?? new YahooFinanceGetDataInfoModel();
+
+            return ModelPropertiesCollectionConverter.ModelToPropertiesCollection(getDataInfo);
+        }
+
+        public async Task<StandartResponse> SetQuotesProviderParameters(SetQuotesProviderParametersRequest request)
+        {
+            try
+            {
+                var quotesProviderId = (await _quotesProvidersRepository.GetQuotesProviderByType(request.QuotesProvider))?.Id
+                    ?? throw new InvalidOperationException($"QuotesProvider {request.QuotesProvider.ToString()} not exist in DB");
+
+                var ticker = await GetTicker(request.TickerName, request.MarketName);
+
+                if (ticker.QuotesProviderId != null && ticker.QuotesProviderId != quotesProviderId)
+                {
+                    var existingQuotesProvider = await _quotesProvidersRepository.GetQuotesProviderById((int)ticker.QuotesProviderId);
+                    throw new InvalidOperationException($"Для тикера {request.TickerName} рынок {request.MarketName} уже установлен другой поставщик котировок - {existingQuotesProvider?.Name}");
+                }
+
+                var getDataInfo = ModelPropertiesCollectionConverter.PropertiesCollectionToModel<YahooFinanceGetDataInfoModel>(request.Parameters).Serialize();
+
+                if (ticker.ProviderGetDataInfo != getDataInfo)
+                {
+                    ticker.ProviderGetDataInfo = getDataInfo;
+                    await _tickersRepository.UpdateAsync(ticker);
+                }
+
+                return new StandartResponse() { IsSuccess = true };
+            }
+            catch (Exception ex)
+            {
+                return new StandartResponse()
+                {
+                    IsSuccess = false,
+                    Message = ex.Message
+                };
+            }
+
+        }
+
+        #region private static
+
+        private static async Task<GetQuotesResponse> GetQuotes(string url)
+        {
+            var response = new GetQuotesResponse();
 
             using (var reader = new System.IO.StreamReader(new WebClient().OpenRead(url) ?? throw new InvalidOperationException($"Не удалось получить данные по адресу '{url}'")))
             {
@@ -45,53 +149,6 @@ namespace QuotesService.BL.Services.Implementation
 
             return response;
         }
-
-        public async Task<CheckGetQuotesResponse> CheckGetQuotes(CheckGetQuotesRequest request)
-        {
-            var getQuotesRequest = new GetQuotesRequest()
-            {
-                Symbol = request.Symbol,
-                StartDate = request.StartDate,
-                EndDate = request.StartDate.AddMonths(1),
-                TimeFrame = TimeFrameEnum.D1
-            };
-
-            try
-            {
-                var quotes = await GetQuotes(getQuotesRequest);
-
-                if (quotes.Quotes.Any())
-                {
-                    return new CheckGetQuotesResponse()
-                    {
-                        GUID = request.GUID,
-                        IsSuccess = true,
-                        StartDate = quotes.Quotes.Select(x => x.Date).Min()
-                    };
-                }
-                else
-                {
-                    return new CheckGetQuotesResponse()
-                    {
-                        GUID = request.GUID,
-                        IsSuccess = false,
-                        ErrorMessage = $"Для начальной даты {request.StartDate.ToString("d")} в течение месяча не было ни одной котировки"
-                    };
-                }
-            }
-            catch (Exception e)
-            {
-                return new CheckGetQuotesResponse()
-                {
-                    GUID = request.GUID,
-                    IsSuccess = false,
-                    ErrorMessage = e.Message
-                };
-            }
-        }
-
-        #region private static
-        private static readonly DateTime ZeroDt = new DateTime(1970, 1, 1);
 
         private static string GetQuotesURL(string tickerSymbol, DateTime start, DateTime end, TimeFrameEnum timeFrame)
         {
@@ -103,7 +160,7 @@ namespace QuotesService.BL.Services.Implementation
 
         private static long GetDateValue(DateTime dt)
         {
-            return (long)((dt - ZeroDt).TotalSeconds);
+            return (long)((dt - _zeroDt).TotalSeconds);
         }
 
         private static string GetTimeFrameCode(TimeFrameEnum timeFrame)
@@ -119,7 +176,7 @@ namespace QuotesService.BL.Services.Implementation
             }
         }
 
-        private List<QuoteModel> ParseQuotes(string data)
+        private static List<QuoteModel> ParseQuotes(string data)
         {
             var result = new List<QuoteModel>();
 
@@ -140,6 +197,25 @@ namespace QuotesService.BL.Services.Implementation
 
             return result;
         }
+
+        private async Task<TickerEntity> GetTicker(string tickerName, string marketName)
+        {
+            var tickerAndMarketRequest = new TickerAndMarketRequest()
+            {
+                MarketName = marketName,
+                TickerName = tickerName
+            };
+
+            var ticker = await _tickersRepository.GetByTickerAndMarket(tickerAndMarketRequest);
+
+            if (ticker == null)
+            {
+                throw new InvalidOperationException($"Ticker not found for {tickerAndMarketRequest.Serialize()}");
+            }
+
+            return ticker;
+        }
+
         #endregion
     }
 }

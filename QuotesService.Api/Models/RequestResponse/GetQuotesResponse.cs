@@ -7,7 +7,7 @@ using CommonLibraries.Core.Base;
 
 namespace QuotesService.Api.Models.RequestResponse
 {
-    public class GetQuotesResponse : BaseGuidResponse
+    public class GetQuotesResponse
     {
         public List<QuoteModel> Quotes { get; set; } = new List<QuoteModel>();
     }
