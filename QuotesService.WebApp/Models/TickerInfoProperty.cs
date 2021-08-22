@@ -7,12 +7,10 @@ namespace QuotesService.WebApp.Models
 {
     public class TickerInfoProperty
     {
-        //public string FieldName { get; set; }
-
         public string Name { get; set; }
 
         public string Value { get; set; }
 
-        public bool ReadOnly { get; set;  }
+        public bool ReadOnly { get; set; }
     }
 }

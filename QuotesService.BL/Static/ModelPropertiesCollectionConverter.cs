@@ -13,7 +13,7 @@ namespace QuotesService.BL.Static
             return obj
                 .GetType()
                 .GetProperties()
-                .Select(x => new KeyValuePair<string, string>(x.Name, x.GetValue(obj).ToString()))
+                .Select(x => new KeyValuePair<string, string>(x.Name, x.GetValue(obj)?.ToString()))
                 .ToList();
         }
 

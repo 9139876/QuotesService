@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using CommonLibraries.Core.Base;
 using QuotesService.Api.Enum;
 
-namespace QuotesService.Api.Models.RequestResponse
+namespace QuotesService.ApiPrivate.Models.RequestResponse
 {
     public class CheckGetQuotesRequest
     {

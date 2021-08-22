@@ -11,72 +11,45 @@
 </head>
 
 <body>
-	<h2>Привет мир!</h2>
-	<div id="indexMain" class="container">
-		<div class="border">
-			<p class="fw-bold text-center">Дата: @DateTime.Now.ToString("F")</p>
-			<div class="row">
-				<div class="col-4">
-					<div class="border text-center">
-						Одна из трёх колонок
-					</div>
+	<div>
+		@* Header *@
+		<div>
+			<h2>Header</h2>
+		</div>
+
+		@* Body *@
+		<div class="container">
+			<ul class="nav nav-tabs" id="myTab" role="tablist">
+				<li class="nav-item">
+					<button class="nav-link" data-bs-toggle="tab" data-bs-target="#marketsTab" type="button" role="tab"
+						aria-selected="false">Рынки и инструменты</button>
+				</li>
+				<li class="nav-item">
+					<button class="nav-link" data-bs-toggle="tab" data-bs-target="#shedulesTab" type="button" role="tab"
+						aria-selected="false">Расписания получения котировок</button>
+				</li>
+			</ul>
+			<div class="tab-content" id="myTabContent">
+				<div class="tab-pane fade" id="marketsTab" role="tabpanel">
+					@await Html.PartialAsync("~/Views/QuotesGetter/Main.cshtml")
 				</div>
-				<div class="col-4">
-					<div class="border">
-						Одна из трёх колонок
-					</div>
-				</div>
-				<div class="col-4">
-					<div class="border">
-						Одна из трёх колонок
-					</div>
+				<div class="tab-pane fade" id="shedulesTab" role="tabpanel">
+					...
 				</div>
 			</div>
+		</div>
 
-
-
+		@* Footer *@
+		<div class="position-absolute bottom-0 start-0">
+			<h2>Footer</h2>
 		</div>
 	</div>
-
-	<div class="border" id="mainContentSection"></div>
 
 	<link rel="stylesheet" href="~/css/bootstrap.min.css" asp-append-version="true" />
 
 	<script src="~/js/lib/axios.min.js" asp-append-version="true"></script>
 	<script src="~/js/lib/vue.min.js" asp-append-version="true"></script>
 	<script src="~/js/lib/bootstrap.min.js" asp-append-version="true"></script>
-
-	<script>
-		/*Pages*/
-		const quotesGetterUrl = '/quotesGetter/main';
-		const loadFromFileUrl = '/loadFromFile/Main';
-		/**/
-		const getMarketsUrl = '/quotes-getter-api/get-markets';
-		const addMarketUrl = '/quotes-getter-api/add-market';
-		const deleteMarketUrl = '/quotes-getter-api/delete-market';
-		const addTickerUrl = '/quotes-getter-api/add-ticker';
-		const deleteTickerUrl = '/quotes-getter-api/delete-ticker';
-		const getTickerInfoUrl = '/quotes-getter-api/get-ticker-info';
-		const setTickerInfoUrl = '/quotes-getter-api/set-ticker-info';
-
-		function setMainContent(url) {
-			axios
-				.get(url)
-				.then(response => {
-					//document.getElementById("mainContentSection").innerHTML = response.data;
-					document.getElementById("mainContentSection").insertAdjacentHTML('afterbegin', response.data);
-				})
-				.catch(error => {
-					alert(error);
-				});
-		}
-	</script>
-
-	<script src="~/js/indexMainScript.js" asp-append-version="true"></script>
-
-	<script src="~/js/fileLoaderScript.js" asp-append-version="true"></script>
-	<script src="~/js/quotesGetterScript.js" asp-append-version="true"></script>
-
 </body>
 
 </html>

@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using QuotesService.Api.Enum;
-using QuotesService.Api.Models;
 using QuotesService.Api.Models.RequestResponse;
+using QuotesService.ApiPrivate.Models;
+using QuotesService.ApiPrivate.Models.RequestResponse;
 
-namespace QuotesService.Api.Services
+namespace QuotesService.ApiPrivate.Services
 {
-    public interface IGetDataRemoteCallService
+    public interface IQuotesProviderRemoteCallService
     {
         Task<CheckGetQuotesResponse> CheckGetQuotes(CheckGetQuotesRequest request);
 
         Task<GetQuotesResponse> GetQuotes(GetQuotesRequest request);
+
+        Task<GetQuotesProviderResponse> GetQuotesProvider(TickerAndMarketRequest request);
 
         Task<List<KeyValuePair<string, string>>> GetQuotesProviderParameters(GetQuotesProviderParametersRequest request);
 

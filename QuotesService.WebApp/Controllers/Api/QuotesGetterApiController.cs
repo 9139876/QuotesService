@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using QuotesService.Api.Enum;
 using QuotesService.Api.Models.RequestResponse;
+using QuotesService.ApiPrivate.Models;
+using QuotesService.ApiPrivate.Models.RequestResponse;
+using QuotesService.ApiPrivate.Services;
 using QuotesService.DAL.Entities;
 using QuotesService.DAL.Internal;
 using QuotesService.DAL.Models;
@@ -25,7 +28,9 @@ namespace QuotesService.WebApp.Controllers.Api
         private readonly ITickersInfoesRepository _tickersInfoesRepository;
         private readonly ITickersInfoesNamesRepository _tickersInfoesNamesRepository;
         private readonly ITickerTFsRepository _tickerTFsRepository;
+        private readonly IQuotesProvidersRepository _quotesProvidersRepository;
         private readonly IQuotesDbContext _quotesDbContext;
+        private readonly IQuotesProviderRemoteCallService _quotesProviderRemoteCallService;
 
         public QuotesGetterApiController(
             IMarketsRepository marketsRepository,
@@ -33,14 +38,18 @@ namespace QuotesService.WebApp.Controllers.Api
             ITickersInfoesRepository tickersInfoesRepository,
             ITickersInfoesNamesRepository tickersInfoesNamesRepository,
             ITickerTFsRepository tickerTFsRepository,
-            IQuotesDbContext quotesDbContext)
+            IQuotesProvidersRepository quotesProvidersRepository,
+            IQuotesDbContext quotesDbContext,
+            IQuotesProviderRemoteCallService quotesProviderRemoteCallService)
         {
             _marketsRepository = marketsRepository;
             _tickersRepository = tickersRepository;
             _tickersInfoesRepository = tickersInfoesRepository;
             _tickersInfoesNamesRepository = tickersInfoesNamesRepository;
             _tickerTFsRepository = tickerTFsRepository;
+            _quotesProvidersRepository = quotesProvidersRepository;
             _quotesDbContext = quotesDbContext;
+            _quotesProviderRemoteCallService = quotesProviderRemoteCallService;
         }
 
         [HttpGet("get-markets")]
@@ -279,6 +288,20 @@ namespace QuotesService.WebApp.Controllers.Api
                 }).ToList()
             };
 
+            string quotesProviderName = null;
+
+            if (existingTicker.QuotesProviderId > 0)
+            {
+                quotesProviderName = (await _quotesProvidersRepository.GetQuotesProviderById(existingTicker.QuotesProviderId.Value))?.Name;
+            }
+
+            result.Properties.Add(new TickerInfoProperty()
+            {
+                Name = "Поставщик котировок",
+                Value = quotesProviderName,
+                ReadOnly = true
+            });
+
             return result;
         }
 
@@ -332,7 +355,9 @@ namespace QuotesService.WebApp.Controllers.Api
                     {
                         forInsert.Add(new TickerInfoEntity()
                         {
-
+                            TickerId = existingTicker.Id,
+                            KeyName = name,
+                            Value = newValue.Value
                         });
                     }
                     else if (newValue.Value != oldValue.Value)
@@ -359,9 +384,51 @@ namespace QuotesService.WebApp.Controllers.Api
                 {
                     await _tickersInfoesRepository.UpdateAsync(upd);
                 }
+
+                transaction.Commit();
             }
 
             return new StandartResponse() { IsSuccess = true };
+        }
+
+        [HttpPost("check-get-quotes")]
+        public async Task<CheckGetQuotesResponse> CheckGetQuotes([FromBody] CheckGetQuotesRequest request)
+        {
+            request.RequiredNotNull(nameof(request));
+
+            return await _quotesProviderRemoteCallService.CheckGetQuotes(request);
+        }
+
+        [HttpPost("get-quotes")]
+        public async Task<GetQuotesResponse> GetQuotes([FromBody] GetQuotesRequest request)
+        {
+            request.RequiredNotNull(nameof(request));
+
+            return await _quotesProviderRemoteCallService.GetQuotes(request);
+        }
+
+        [HttpPost("get-quotes-provider")]
+        public async Task<GetQuotesProviderResponse> GetQuotesProvider([FromBody] TickerAndMarketRequest request)
+        {
+            request.RequiredNotNull(nameof(request));
+
+            return await _quotesProviderRemoteCallService.GetQuotesProvider(request);
+        }
+
+        [HttpPost("get-quotes-provider-parameters")]
+        public async Task<List<KeyValuePair<string, string>>> GetQuotesProviderParameters([FromBody] GetQuotesProviderParametersRequest request)
+        {
+            request.RequiredNotNull(nameof(request));
+
+            return await _quotesProviderRemoteCallService.GetQuotesProviderParameters(request);
+        }
+
+        [HttpPost("set-quotes-provider-parameters")]
+        public async Task<StandartResponse> SetQuotesProviderParameters([FromBody] SetQuotesProviderParametersRequest request)
+        {
+            request.RequiredNotNull(nameof(request));
+
+            return await _quotesProviderRemoteCallService.SetQuotesProviderParameters(request);
         }
     }
 }

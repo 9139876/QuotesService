@@ -2,8 +2,8 @@
 	Layout = null;
 }
 
-<div id="quotesGetterApp" class="container">
-	<div class="border">
+<div id="quotesGetterApp">
+	<div>
 
 		<h4>Рынок</h4>
 		<form class="row g-3">
@@ -50,51 +50,82 @@
 		</form>
 
 		<template v-if="currentTickerName?.length > 0">
+			<ul class="nav nav-tabs" id="myTab" role="tablist">
+				<li class="nav-item">
+					<button class="nav-link" data-bs-toggle="tab" data-bs-target="#tickerInfoTab" type="button"
+						role="tab" aria-selected="false">Информация об инструменте</button>
+				</li>
+				<li class="nav-item">
+					<button class="nav-link" data-bs-toggle="tab" data-bs-target="#quotesInfoTab" type="button"
+						role="tab" aria-selected="false">Информация о котировках</button>
+				</li>
+				<li class="nav-item">
+					<button class="nav-link" data-bs-toggle="tab" data-bs-target="#quotesProviderTab" type="button"
+						role="tab" aria-selected="false">Источник котировок</button>
+				</li>
+				<li class="nav-item">
+					<button class="nav-link" data-bs-toggle="tab" data-bs-target="#loadFromFileTab" type="button"
+						role="tab" aria-selected="false">Загрузка котировок из файла</button>
+				</li>
+			</ul>
+			<div class="tab-content" id="myTabContent">
+				<div class="tab-pane fade container border" id="tickerInfoTab" role="tabpanel">
+					<div v-for="(item, index) in currentTickerInfo?.properties">
+						<label v-bind:for="'addedMarketNameInput' + index" class="form-label"><strong>{{item.name}}</strong></label>
+						<input type="text" class="form-control" v-bind:id="'addedMarketNameInput' + index" v-bind:readonly="item.readOnly" v-model="item.value">
+					</div>
 
-			<h4>Информация об инструменте</h4>
-			<form class="row g-3">
-				<div class="col-md-2">
-					<button type="button" class="btn btn-primary" data-bs-toggle="modal"
-						data-bs-target="#tickerInfoViewModal" v-on:click="getTickerInfo()">Просмотр</button>
+					<div class="d-grid gap-2 d-md-flex justify-content-md-end">
+						<button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+							v-on:click="setTickerInfo()">Сохранить изменения</button>
+					</div>
 				</div>
+				<div class="tab-pane fade" id="quotesInfoTab" role="tabpanel">
+					Информация о котировках
+				</div>
+				<div class="tab-pane fade" id="quotesProviderTab" role="tabpanel">
+					Источник котировок
+				</div>
+				<div class="tab-pane fade" id="loadFromFileTab" role="tabpanel">
+					Загрузка котировок из файла
+				</div>
+			</div>
 
-				<div class="col-md-2">
-					<button type="button" class="btn btn-primary" data-bs-toggle="modal"
-						data-bs-target="#tickerInfoEditModal" v-on:click="getTickerInfo()">Редактирование</button>
-				</div>
-			</form>
+		</template>
+
+		@* <template v-if="currentTickerName?.length > 0">
 
 			<h4>Информация о котировках</h4>
 			<form class="row g-3">
-				<div class="col-md-2">
-					<button type="button" class="btn btn-primary" data-bs-toggle="modal"
-						data-bs-target="#addTickerModal">Просмотр</button>
-				</div>
+			<div class="col-md-2">
+			<button type="button" class="btn btn-primary" data-bs-toggle="modal"
+			data-bs-target="#addTickerModal">Просмотр</button>
+			</div>
 			</form>
 
 			<h4>Настройка автоматического получения котировок</h4>
 			<form class="row g-3">
-				<div class="col-md-2">
-					<button type="button" class="btn btn-primary" data-bs-toggle="modal"
-						data-bs-target="#addTickerModal">Параметры</button>
-				</div>
+			<div class="col-md-2">
+			<button type="button" class="btn btn-primary" data-bs-toggle="modal"
+			data-bs-target="#addTickerModal">Параметры</button>
+			</div>
 
-				<div class="col-md-2">
-					<button type="button" class="btn btn-primary" data-bs-toggle="modal"
-						data-bs-target="#addTickerModal">Расписания</button>
-				</div>
+			<div class="col-md-2">
+			<button type="button" class="btn btn-primary" data-bs-toggle="modal"
+			data-bs-target="#addTickerModal">Расписания</button>
+			</div>
 			</form>
 
 			<h4>Загрузка котировок из файла</h4>
 			<form class="row g-3">
-				<div class="col-md-2">
-					@* <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-						data-bs-target="#addTickerModal">Загрузить</button> *@
-					<button type="button" class="btn btn-primary" v-on:click="goToLoadFromFile()">Загрузить</button>
-				</div>
+			<div class="col-md-2">
+			@* <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+			data-bs-target="#addTickerModal">Загрузить</button> *@
+		@*<button type="button" class="btn btn-primary" v-on:click="goToLoadFromFile()">Загрузить</button>
+			</div>
 			</form>
 
-		</template>
+			</template> *@
 	</div>
 
 	<!-- #region Modal Add Market-->
@@ -176,52 +207,6 @@
 				<div class="modal-footer">
 					<button type="button" class="btn btn-danger" data-bs-dismiss="modal"
 						v-on:click="deleteTicker()">Удалить</button>
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- #endregion -->
-
-	<!-- #region Modal Ticker info view-->
-	<div class="modal fade" id="tickerInfoViewModal" tabindex="-1" data-bs-backdrop="static">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title">Информация об инструменте</h5>
-				</div>
-				<div class="modal-body" v-for="item in currentTickerInfo?.properties">
-					<div><strong>{{item.name}}</strong></div>
-					<div class="border">{{item.value}}</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- #endregion -->
-
-	<!-- #region Modal Ticker info edit-->
-	<div class="modal fade" id="tickerInfoEditModal" tabindex="-1" data-bs-backdrop="static">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title">Информация об инструменте - редактирование</h5>
-				</div>
-				<div class="modal-body" v-for="item in currentTickerInfo?.properties">
-					<div v-if="item.readOnly === true">
-						<div><strong>{{item.name}}</strong></div>
-						<div class="border">{{item.value}}</div>
-					</div>
-					<div v-else>
-						<label for="addedMarketNameInput" class="form-label"><strong>{{item.name}}</strong></label>
-						<input type="text" class="form-control" id="addedMarketNameInput" v-model="item.value">
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-primary" data-bs-dismiss="modal"
-						v-on:click="setTickerInfo()">Сохранить</button>
 					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
 				</div>
 			</div>

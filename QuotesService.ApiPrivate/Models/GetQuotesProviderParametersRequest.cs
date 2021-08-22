@@ -5,11 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QuotesService.Api.Models.RequestResponse
+namespace QuotesService.ApiPrivate.Models.RequestResponse
 {
     public class GetQuotesProviderParametersRequest
     {
-        public QuotesProviderEnum QuotesProvider { get; set; }
+        public QuotesProviderEnum QuotesProviderType { get; set; }
 
         public string TickerName { get; set; }
 

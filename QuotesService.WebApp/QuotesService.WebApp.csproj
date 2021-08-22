@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\QuotesService.ApiPrivate\QuotesService.ApiPrivate.csproj" />
     <ProjectReference Include="..\QuotesService.DAL\QuotesService.DAL.csproj" />
   </ItemGroup>
 
@@ -25,6 +26,10 @@
     <Content Update="C:\Users\Andrew\.nuget\packages\commonlibraries.web\1.0.5\contentFiles\any\net5.0\nlog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Views\QuotesProviderSchedule\" />
   </ItemGroup>
 
 </Project>

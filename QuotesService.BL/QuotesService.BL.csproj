@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\QuotesService.Api\QuotesService.Api.csproj" />
+    <ProjectReference Include="..\QuotesService.ApiPrivate\QuotesService.ApiPrivate.csproj" />
     <ProjectReference Include="..\QuotesService.DAL\QuotesService.DAL.csproj" />
   </ItemGroup>
 

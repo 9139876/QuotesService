@@ -9,9 +9,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\QuotesService.Api\QuotesService.Api.csproj" />
+    <ProjectReference Include="..\QuotesService.ApiPrivate\QuotesService.ApiPrivate.csproj" />
     <ProjectReference Include="..\QuotesService.BL\QuotesService.BL.csproj" />
-    <ProjectReference Include="..\QuotesService.DAL\QuotesService.DAL.csproj" />
   </ItemGroup>
 
   <ItemGroup>

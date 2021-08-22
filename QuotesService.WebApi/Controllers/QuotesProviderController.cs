@@ -4,11 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using CommonLibraries.Core.Extensions;
 using Microsoft.AspNetCore.Mvc;
-using QuotesService.Api.Enum;
-using QuotesService.Api.Models;
 using QuotesService.Api.Models.RequestResponse;
+using QuotesService.ApiPrivate.Models;
+using QuotesService.ApiPrivate.Models.RequestResponse;
 using QuotesService.BL.Services;
-using QuotesService.DAL.Entities;
 using QuotesService.DAL.Repositories;
 
 namespace QuotesService.WebApi.Controllers
@@ -18,14 +17,17 @@ namespace QuotesService.WebApi.Controllers
     public class QuotesProviderController
     {
         private readonly IStrategyService _strategyService;
-        private readonly IMarketsRepository _marketEntityRepository;
+        private readonly ITickersRepository _tickersRepository;
+        private readonly IQuotesProvidersRepository _quotesProvidersRepository;
 
         public QuotesProviderController(
             IStrategyService strategyService,
-            IMarketsRepository marketEntityRepository)
+            ITickersRepository tickersRepository,
+            IQuotesProvidersRepository quotesProvidersRepository)
         {
             _strategyService = strategyService;
-            _marketEntityRepository = marketEntityRepository;
+            _tickersRepository = tickersRepository;
+            _quotesProvidersRepository = quotesProvidersRepository;
         }
 
         [HttpPost]
@@ -51,18 +53,57 @@ namespace QuotesService.WebApi.Controllers
         }
 
         [HttpPost]
-        [Route("get-quotes-privider-parameters")]
+        [Route("get-quotes-provider")]
+        public async Task<GetQuotesProviderResponse> GetQuotesProvider([FromBody] TickerAndMarketRequest request)
+        {
+            request.RequiredNotNull(nameof(request));
+
+            var existingTicker = await _tickersRepository.GetByTickerAndMarket(request);
+
+            if (existingTicker == null)
+            {
+                throw new InvalidOperationException($"Ticker {request.TickerName} in market {request.MarketName} not exsit");
+            }
+
+            var allQuotesProviders = await _quotesProvidersRepository.GetAllQuotesProviders();
+
+            var result = new GetQuotesProviderResponse()
+            {
+                AllQuotesProviders = allQuotesProviders.Select(x => new QuotesProvider()
+                {
+                    QuotesProviderName = x.Name,
+                    QuotesProviderType = x.QuotesProviderType
+                }).ToList()
+            };
+
+            if (existingTicker.QuotesProviderId > 0)
+            {
+                var currentQuotesProvider = await _quotesProvidersRepository.GetQuotesProviderById(existingTicker.QuotesProviderId.Value);
+                currentQuotesProvider.RequiredNotNull(nameof(currentQuotesProvider), existingTicker.QuotesProviderId);
+
+                result.CurrentQuotesProvider = new QuotesProvider()
+                {
+                    QuotesProviderName = currentQuotesProvider.Name,
+                    QuotesProviderType = currentQuotesProvider.QuotesProviderType
+                };
+            }
+
+            return result;
+        }
+
+        [HttpPost]
+        [Route("get-quotes-provider-parameters")]
         public async Task<List<KeyValuePair<string, string>>> GetQuotesProviderParameters([FromBody] GetQuotesProviderParametersRequest request)
         {
             request.RequiredNotNull(nameof(request));
 
-            var service = _strategyService.GetInstance(request.QuotesProvider);
+            var service = _strategyService.GetInstance(request.QuotesProviderType);
 
             return await service.GetQuotesProviderParameters(request);
         }
 
         [HttpPost]
-        [Route("set-quotes-privider-parameters")]
+        [Route("set-quotes-provider-parameters")]
         public async Task<StandartResponse> SetQuotesProviderParameters([FromBody] SetQuotesProviderParametersRequest request)
         {
             request.RequiredNotNull(nameof(request));

@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 using QuotesService.Api.Enum;
 using QuotesService.Api.Models;
 using QuotesService.Api.Models.RequestResponse;
+using QuotesService.ApiPrivate.Models.RequestResponse;
 using QuotesService.BL.Models;
 using QuotesService.BL.Static;
 using QuotesService.DAL.Entities;
@@ -22,14 +23,12 @@ namespace QuotesService.BL.Services.Implementation
     {
         private static readonly DateTime _zeroDt = new DateTime(1970, 1, 1);
         private readonly ITickersRepository _tickersRepository;
-        private readonly IQuotesProvidersRepository _quotesProvidersRepository;
 
         public YahooFinanceService(
-            ITickersRepository tickersRepository,
-            IQuotesProvidersRepository quotesProvidersRepository)
+            ITickersRepository tickersRepository
+            )
         {
             _tickersRepository = tickersRepository;
-            _quotesProvidersRepository = quotesProvidersRepository;
         }
 
         public async Task<GetQuotesResponse> GetQuotes(GetQuotesRequest request)
@@ -103,15 +102,11 @@ namespace QuotesService.BL.Services.Implementation
         {
             try
             {
-                var quotesProviderId = (await _quotesProvidersRepository.GetQuotesProviderByType(request.QuotesProvider))?.Id
-                    ?? throw new InvalidOperationException($"QuotesProvider {request.QuotesProvider.ToString()} not exist in DB");
-
                 var ticker = await GetTicker(request.TickerName, request.MarketName);
 
-                if (ticker.QuotesProviderId != null && ticker.QuotesProviderId != quotesProviderId)
+                if (ticker.QuotesProviderId != null)
                 {
-                    var existingQuotesProvider = await _quotesProvidersRepository.GetQuotesProviderById((int)ticker.QuotesProviderId);
-                    throw new InvalidOperationException($"Для тикера {request.TickerName} рынок {request.MarketName} уже установлен другой поставщик котировок - {existingQuotesProvider?.Name}");
+                    throw new InvalidOperationException($"Для инструмента {request.TickerName} рынок {request.MarketName} уже установлены параметры поставщика котировок, изменять их нельзя, нужно создать новый инструмент");
                 }
 
                 var getDataInfo = ModelPropertiesCollectionConverter.PropertiesCollectionToModel<YahooFinanceGetDataInfoModel>(request.Parameters).Serialize();

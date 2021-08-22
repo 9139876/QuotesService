@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CommonLibraries.Core.Base;
 
-namespace QuotesService.Api.Models.RequestResponse
+namespace QuotesService.ApiPrivate.Models.RequestResponse
 {
     public class CheckGetQuotesResponse
     {

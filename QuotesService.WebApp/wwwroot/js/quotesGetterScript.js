@@ -13,6 +13,11 @@
             const vue = this;
 
             vue.currentTickerName = '';
+        },
+        currentTickerName: function (newValue) {
+            const vue = this;
+
+            vue.getTickerInfo();
         }
     },
     computed: {
@@ -160,13 +165,7 @@
         getTickerInfo: function () {
             const vue = this;
 
-            if (vue.currentMarketName?.length > 0 === false) {
-                alert('Рынок не выбран!');
-                return;
-            }
-
-            if (vue.currentTickerName?.length > 0 === false) {
-                alert('Инструмент не выбран!');
+            if (vue.currentMarketName?.length > 0 === false || vue.currentTickerName?.length > 0 === false) {
                 return;
             }
 
@@ -180,7 +179,7 @@
                 .post(getTickerInfoUrl, request)
                 .then(response => {
                     if (response.data?.status?.isSuccess === true) {
-                        vue.currentTickerInfo = response.data;
+                        vue.currentTickerInfo = response.data;                        
                     }
                     else {
                         alert('Ошибка: ' + response.data?.status?.message ?? 'неизвестная ошибка сервера');
@@ -199,9 +198,9 @@
             }
 
             axios
-                .post(setTickerInfoUrl, vue.currentTickerInfo.properties)
+                .post(setTickerInfoUrl, vue.currentTickerInfo)
                 .then(response => {
-                    if (response.data?.isSuccess === true) {
+                    if (response.data?.isSuccess === true) {                        
                         alert('Изменения успешно сохранены');
                     }
                     else {

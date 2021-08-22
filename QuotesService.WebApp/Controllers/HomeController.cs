@@ -14,5 +14,10 @@ namespace QuotesService.WebApp.Controllers
         {
             return View();
         }
+
+        public ActionResult QuotesGetter()
+        {
+            return PartialView("~/Views/QuotesGetter/Main.cshtml");
+        }
     }
 }

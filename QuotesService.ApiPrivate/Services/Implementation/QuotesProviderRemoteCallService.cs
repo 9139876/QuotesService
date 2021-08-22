@@ -1,20 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using CommonLibraries.RemoteCall;
 using CommonLibraries.RemoteCall.Services;
 using Microsoft.Extensions.Configuration;
-using QuotesService.Api.Enum;
-using QuotesService.Api.Models;
 using QuotesService.Api.Models.RequestResponse;
+using QuotesService.ApiPrivate.Models;
+using QuotesService.ApiPrivate.Models.RequestResponse;
 
-namespace QuotesService.Api.Services.Implementation
+namespace QuotesService.ApiPrivate.Services.Implementation
 {
-    class GetDataRemoteCallService : BaseRemoteCallService, IGetDataRemoteCallService
+    class QuotesProviderRemoteCallService : BaseRemoteCallService, IQuotesProviderRemoteCallService
     {
-        public GetDataRemoteCallService(
+        public QuotesProviderRemoteCallService(
             IConfiguration configuration,
             IRemoteCallHelperService remoteCallHelperService) : base(configuration, remoteCallHelperService) { }
 
@@ -26,10 +24,13 @@ namespace QuotesService.Api.Services.Implementation
         public async Task<GetQuotesResponse> GetQuotes(GetQuotesRequest request)
             => await ExecutePostAsync<GetQuotesResponse, GetQuotesRequest>("api/quotes-provider/get-quotes", request);
 
+        public async Task<GetQuotesProviderResponse> GetQuotesProvider(TickerAndMarketRequest request)
+            => await ExecutePostAsync<GetQuotesProviderResponse, TickerAndMarketRequest>("api/quotes-provider/get-quotes-privider", request);
+
         public async Task<List<KeyValuePair<string, string>>> GetQuotesProviderParameters(GetQuotesProviderParametersRequest request)
-        => await ExecutePostAsync<List<KeyValuePair<string, string>>, GetQuotesProviderParametersRequest>("api/quotes-provider/get-quotes-privider-parameters", request);
+            => await ExecutePostAsync<List<KeyValuePair<string, string>>, GetQuotesProviderParametersRequest>("api/quotes-provider/get-quotes-privider-parameters", request);
 
         public async Task<StandartResponse> SetQuotesProviderParameters(SetQuotesProviderParametersRequest request)
-        => await ExecutePostAsync<StandartResponse, SetQuotesProviderParametersRequest>("api/quotes-provider/set-quotes-privider-parameters", request);
+            => await ExecutePostAsync<StandartResponse, SetQuotesProviderParametersRequest>("api/quotes-provider/set-quotes-privider-parameters", request);
     }
 }
