@@ -17,7 +17,6 @@ namespace QuotesService.DAL.Internal.Implementation
         public DbSet<TickerInfoEntity> TickersInfoes { get; set; }
         public DbSet<TickerInfoNameEntity> TickersInfoesNames { get; set; }
         public DbSet<TickerTFEntity> TickerTFs { get; set; }
-        public DbSet<QuotesProviderTFEntity> QuotesProviderTFs { get; set; }
         public DbSet<QuotesProviderTaskEntity> QuotesProvidersTasks { get; set; }
     }
 }

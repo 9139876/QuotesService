@@ -17,13 +17,14 @@ namespace QuotesService.WebApp
     {
         protected override void ConfigureApplication(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            ConfigureWebApp(app, env);
+            ConfigureWebAppStaticFiles(app, env);
         }
 
         protected override void ConfigureServiceCollections(IServiceCollection services)
         {
             services.RegisterDbContexts(Configuration);
 
+            services.RegisterAssemblyServiceAndRepositoryByMember<ApiPrivate.PlaceboRegistration>();
             services.RegisterAssemblyServiceAndRepositoryByMember<DAL.PlaceboRegistration>();
             services.RegisterAssemblyServiceAndRepositoryByMember<Startup>();
         }
@@ -42,10 +43,12 @@ namespace QuotesService.WebApp
         {
             app.UseEndpoints(endpoints =>
                 {
-                    endpoints.MapControllerRoute(
-                        name: "default",
-                        pattern: "{controller=Home}/{action=Index}/{id?}");
-                        //pattern: "{controller=QuotesGetter}/{action=Main}/{id?}");
+                    endpoints.MapDefaultControllerRoute();
+                    //endpoints.MapControllerRoute(
+                    //    name: "default",
+                    ////pattern: "{controller=Home}/{action=Index}/{id?}");
+                    //pattern: "{controller=Main}/{action=Index}/{id?}");
+                    ////pattern: "{controller=QuotesGetter}/{action=Main}/{id?}");
                 });
         }
     }

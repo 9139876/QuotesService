@@ -1,8 +1,4 @@
-﻿@{
-	Layout = null;
-}
-
-<div id="quotesGetterApp">
+﻿<div id="quotesGetterApp">
 	<div>
 
 		<h4>Рынок</h4>
@@ -52,27 +48,26 @@
 		<template v-if="currentTickerName?.length > 0">
 			<ul class="nav nav-tabs" id="myTab" role="tablist">
 				<li class="nav-item">
-					<button class="nav-link" data-bs-toggle="tab" data-bs-target="#tickerInfoTab" type="button"
-						role="tab" aria-selected="false">Информация об инструменте</button>
+					<button class="nav-link" data-bs-toggle="tab" type="button" v-on:click="currentTab='tickerInfo'">Информация об инструменте</button>
 				</li>
 				<li class="nav-item">
-					<button class="nav-link" data-bs-toggle="tab" data-bs-target="#quotesInfoTab" type="button"
-						role="tab" aria-selected="false">Информация о котировках</button>
+					<button class="nav-link" data-bs-toggle="tab" type="button" v-on:click="currentTab='quotesInfo'">Информация о котировках</button>
 				</li>
 				<li class="nav-item">
-					<button class="nav-link" data-bs-toggle="tab" data-bs-target="#quotesProviderTab" type="button"
-						role="tab" aria-selected="false">Источник котировок</button>
+					<button class="nav-link" data-bs-toggle="tab" type="button" v-on:click="currentTab='quotesProvider'">Источник котировок</button>
 				</li>
 				<li class="nav-item">
-					<button class="nav-link" data-bs-toggle="tab" data-bs-target="#loadFromFileTab" type="button"
-						role="tab" aria-selected="false">Загрузка котировок из файла</button>
+					<button class="nav-link" data-bs-toggle="tab" type="button" v-on:click="currentTab='loadFromFile'">Загрузка котировок из файла</button>
 				</li>
 			</ul>
 			<div class="tab-content" id="myTabContent">
-				<div class="tab-pane fade container border" id="tickerInfoTab" role="tabpanel">
+				@* TickerInfo *@
+				<div class="container border" v-if="currentTab==='tickerInfo'">
 					<div v-for="(item, index) in currentTickerInfo?.properties">
-						<label v-bind:for="'addedMarketNameInput' + index" class="form-label"><strong>{{item.name}}</strong></label>
-						<input type="text" class="form-control" v-bind:id="'addedMarketNameInput' + index" v-bind:readonly="item.readOnly" v-model="item.value">
+						<label v-bind:for="'addedMarketNameInput' + index"
+							class="form-label"><strong>{{item.name}}</strong></label>
+						<input type="text" class="form-control" v-bind:id="'addedMarketNameInput' + index"
+							v-bind:readonly="item.readOnly" v-model="item.value">
 					</div>
 
 					<div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -80,139 +75,197 @@
 							v-on:click="setTickerInfo()">Сохранить изменения</button>
 					</div>
 				</div>
-				<div class="tab-pane fade" id="quotesInfoTab" role="tabpanel">
+
+				@* Информация о котировках *@
+				<div v-if="currentTab==='quotesInfo'">
 					Информация о котировках
 				</div>
-				<div class="tab-pane fade" id="quotesProviderTab" role="tabpanel">
-					Источник котировок
-				</div>
-				<div class="tab-pane fade" id="loadFromFileTab" role="tabpanel">
-					Загрузка котировок из файла
-				</div>
-			</div>
 
-		</template>
+				@* Quotes provider *@
+				<div v-if="currentTab==='quotesProvider'">
+					<div v-if="currentQuotesProvider?.assigned === true">
+						<h4>Поставщик котировок установлен</h4>
+						<h4>Поставщик котировок</h4>
+						<input type="text" class="form-control" readonly="true"
+							v-model="currentQuotesProvider.assignedName">
 
-		@* <template v-if="currentTickerName?.length > 0">
+						<h4>Параметры</h4>
+						<div v-for="(item, index) in currentQuotesProvider?.parameters">
+							<label v-bind:for="'quotesProviderProperty' + index"
+								class="form-label"><strong>{{item.key}}</strong></label>
+							<input type="text" class="form-control" v-bind:id="'quotesProviderProperty' + index"
+								readonly="true" v-model="item.value">
+						</div>
+					</div>
+					<div v-else>
+						<h4>Поставщик котировок не установлен</h4>
 
-			<h4>Информация о котировках</h4>
-			<form class="row g-3">
-			<div class="col-md-2">
-			<button type="button" class="btn btn-primary" data-bs-toggle="modal"
-			data-bs-target="#addTickerModal">Просмотр</button>
-			</div>
-			</form>
+						<h4>Поставщик котировок</h4>
+						<form class="row g-3">
+							<div class="col-md-8">
+								<select class="form-select form-select-lg" v-model="currentQuotesProvider.assignedName">
+									<option disabled value="">Выбор поставщика котировок</option>
+									<option
+										v-for="item in currentQuotesProvider?.allQuotesProviders?.map(x=>x.quotesProviderName)">
+										{{item}}
+									</option>
+								</select>
+							</div>
 
-			<h4>Настройка автоматического получения котировок</h4>
-			<form class="row g-3">
-			<div class="col-md-2">
-			<button type="button" class="btn btn-primary" data-bs-toggle="modal"
-			data-bs-target="#addTickerModal">Параметры</button>
-			</div>
+							<div class="col-md-2">
+								<button type="button" class="btn btn-primary"
+									v-on:click="getQuotesProviderParameters()">Получить параметры</button>
+							</div>
+						</form>
 
-			<div class="col-md-2">
-			<button type="button" class="btn btn-primary" data-bs-toggle="modal"
-			data-bs-target="#addTickerModal">Расписания</button>
-			</div>
-			</form>
+						<div v-for="(item, index) in currentQuotesProvider?.parameters">
+							<label v-bind:for="'quotesProviderProperty' + index"
+								class="form-label"><strong>{{item.key}}</strong></label>
+							<input type="text" class="form-control" v-bind:id="'quotesProviderProperty' + index"
+								v-model="item.value">
+						</div>
 
-			<h4>Загрузка котировок из файла</h4>
-			<form class="row g-3">
-			<div class="col-md-2">
-			@* <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-			data-bs-target="#addTickerModal">Загрузить</button> *@
-		@*<button type="button" class="btn btn-primary" v-on:click="goToLoadFromFile()">Загрузить</button>
-			</div>
-			</form>
+						<form class="row g-3">
+							<div class="col-md-1" v-if="currentQuotesProvider?.parameters?.length > 0">
+								<button type="button" class="btn btn-primary" v-on:click="checkGetQuotes()">Проверить</button>
+							</div>
 
-			</template> *@
-	</div>
-
-	<!-- #region Modal Add Market-->
-	<div class="modal fade" id="addMarketModal" tabindex="-1" data-bs-backdrop="static">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title">Добавление рынка</h5>
-				</div>
-				<div class="modal-body">
-					<label for="addedMarketNameInput" class="form-label">Название рынка</label>
-					<input type="text" class="form-control" id="addedMarketNameInput" v-model="addedMarketName">
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-primary" data-bs-dismiss="modal"
-						v-on:click="addMarket()">Добавить</button>
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- #endregion -->
-
-	<!-- #region Modal Delete Market-->
-	<div class="modal fade" id="deleteMarketModal" tabindex="-1" data-bs-backdrop="static">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title">Удаление рынка</h5>
-				</div>
-				<div class="modal-body">
-					<h6>Вы уверены, что хотите удалить рынок {{currentMarketName}}?</h6>
-					<div v-if="currentMarketTickers.length > 0">Будут также удалены следующие инструменты:</div>
-					<div v-for="intem in currentMarketTickers">
-						- {{intem}}
+							<div class="col-md-1" v-if="currentQuotesProvider?.parameters?.length > 0">
+								<button type="button" class="btn btn-primary" v-on:click="setQuotesProviderParameters()">Сохранить</button>
+							</div>
+						</form>
 					</div>
 				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-danger" data-bs-dismiss="modal"
-						v-on:click="deleteMarket()">Удалить</button>
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-				</div>
 			</div>
-		</div>
-	</div>
-	<!-- #endregion -->
 
-	<!-- #region Modal Add Ticker-->
-	<div class="modal fade" id="addTickerModal" tabindex="-1" data-bs-backdrop="static">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title">Добавление инструмента</h5>
-				</div>
-				<div class="modal-body">
-					<label for="addedTickerNameInput" class="form-label">Название инструмента</label>
-					<input type="text" class="form-control" id="addedTickerNameInput" v-model="addedTickerName">
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-primary" data-bs-dismiss="modal"
-						v-on:click="addTicker()">Добавить</button>
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-				</div>
+			@* Загрузка котировок из файла *@
+			<div v-if="currentTab==='loadFromFile'">
+				Загрузка котировок из файла
 			</div>
-		</div>
 	</div>
-	<!-- #endregion -->
 
-	<!-- #region Modal Delete Ticker-->
-	<div class="modal fade" id="deleteTickerModal" tabindex="-1" data-bs-backdrop="static">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title">Удаление инструмента</h5>
-				</div>
-				<div class="modal-body">
-					<h6>Вы уверены, что хотите удалить инструмент {{currentTickerName}}?</h6>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-danger" data-bs-dismiss="modal"
-						v-on:click="deleteTicker()">Удалить</button>
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-				</div>
+	</template>
+
+	@* <template v-if="currentTickerName?.length > 0">
+
+		<h4>Информация о котировках</h4>
+		<form class="row g-3">
+		<div class="col-md-2">
+		<button type="button" class="btn btn-primary" data-bs-toggle="modal"
+		data-bs-target="#addTickerModal">Просмотр</button>
+		</div>
+		</form>
+
+		<h4>Настройка автоматического получения котировок</h4>
+		<form class="row g-3">
+		<div class="col-md-2">
+		<button type="button" class="btn btn-primary" data-bs-toggle="modal"
+		data-bs-target="#addTickerModal">Параметры</button>
+		</div>
+
+		<div class="col-md-2">
+		<button type="button" class="btn btn-primary" data-bs-toggle="modal"
+		data-bs-target="#addTickerModal">Расписания</button>
+		</div>
+		</form>
+
+		<h4>Загрузка котировок из файла</h4>
+		<form class="row g-3">
+		<div class="col-md-2">
+		@* <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+		data-bs-target="#addTickerModal">Загрузить</button> *@
+	@*<button type="button" class="btn btn-primary" v-on:click="goToLoadFromFile()">Загрузить</button>
+		</div>
+		</form>
+
+		</template> *@
+</div>
+
+<!-- #region Modal Add Market-->
+<div class="modal fade" id="addMarketModal" tabindex="-1" data-bs-backdrop="static">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Добавление рынка</h5>
+			</div>
+			<div class="modal-body">
+				<label for="addedMarketNameInput" class="form-label">Название рынка</label>
+				<input type="text" class="form-control" id="addedMarketNameInput" v-model="addedMarketName">
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+					v-on:click="addMarket()">Добавить</button>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
 			</div>
 		</div>
 	</div>
-	<!-- #endregion -->
+</div>
+<!-- #endregion -->
+
+<!-- #region Modal Delete Market-->
+<div class="modal fade" id="deleteMarketModal" tabindex="-1" data-bs-backdrop="static">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Удаление рынка</h5>
+			</div>
+			<div class="modal-body">
+				<h6>Вы уверены, что хотите удалить рынок {{currentMarketName}}?</h6>
+				<div v-if="currentMarketTickers.length > 0">Будут также удалены следующие инструменты:</div>
+				<div v-for="item in currentMarketTickers">
+					- {{item}}
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-danger" data-bs-dismiss="modal"
+					v-on:click="deleteMarket()">Удалить</button>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- #endregion -->
+
+<!-- #region Modal Add Ticker-->
+<div class="modal fade" id="addTickerModal" tabindex="-1" data-bs-backdrop="static">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Добавление инструмента</h5>
+			</div>
+			<div class="modal-body">
+				<label for="addedTickerNameInput" class="form-label">Название инструмента</label>
+				<input type="text" class="form-control" id="addedTickerNameInput" v-model="addedTickerName">
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+					v-on:click="addTicker()">Добавить</button>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- #endregion -->
+
+<!-- #region Modal Delete Ticker-->
+<div class="modal fade" id="deleteTickerModal" tabindex="-1" data-bs-backdrop="static">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Удаление инструмента</h5>
+			</div>
+			<div class="modal-body">
+				<h6>Вы уверены, что хотите удалить инструмент {{currentTickerName}}?</h6>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-danger" data-bs-dismiss="modal"
+					v-on:click="deleteTicker()">Удалить</button>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- #endregion -->
 
 </div>
 
@@ -224,6 +277,12 @@
 	const deleteTickerUrl = '/quotes-getter-api/delete-ticker';
 	const getTickerInfoUrl = '/quotes-getter-api/get-ticker-info';
 	const setTickerInfoUrl = '/quotes-getter-api/set-ticker-info';
+
+	const checkGetQuotesUrl = '/quotes-getter-api/check-get-quotes';
+	const getQuotesUrl = '/quotes-getter-api/get-quotes';
+	const getQuotesProviderUrl = '/quotes-getter-api/get-quotes-provider';
+	const getQuotesProviderParametersUrl = '/quotes-getter-api/get-quotes-provider-parameters';
+	const setQuotesProviderParametersUrl = '/quotes-getter-api/set-quotes-provider-parameters';
 </script>
 
 <link rel="stylesheet" href="~/css/bootstrap.min.css" asp-append-version="true" />

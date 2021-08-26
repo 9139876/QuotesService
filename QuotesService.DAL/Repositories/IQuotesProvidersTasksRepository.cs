@@ -1,4 +1,5 @@
 ﻿using CommonLibraries.EF;
+using QuotesService.Api.Enum;
 using QuotesService.DAL.Entities;
 using System;
 using System.Collections.Generic;
@@ -10,5 +11,6 @@ namespace QuotesService.DAL.Repositories
 {
     public interface IQuotesProvidersTasksRepository : IBaseRepository<QuotesProviderTaskEntity>
     {
+        Task<Dictionary<TimeFrameEnum, QuotesProviderTaskEntity>> GetTasksByTickerId(int tickrId);
     }
 }

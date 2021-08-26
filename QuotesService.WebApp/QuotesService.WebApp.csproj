@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommonLibraries.Web" Version="1.0.5" />
+    <PackageReference Include="CommonLibraries.Web" Version="1.0.6" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,10 +26,9 @@
     <Content Update="C:\Users\Andrew\.nuget\packages\commonlibraries.web\1.0.5\contentFiles\any\net5.0\nlog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Views\QuotesProviderSchedule\" />
+    <Content Update="C:\Users\Andrew\.nuget\packages\commonlibraries.web\1.0.6\contentFiles\any\net5.0\nlog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

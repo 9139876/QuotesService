@@ -10,9 +10,7 @@ namespace QuotesService.ApiPrivate.Models.RequestResponse
 {
     public class CheckGetQuotesRequest
     {
-        public QuotesProviderEnum QuotesProvider { get; set; }
-
-        public DateTime StartDate { get; set; }
+        public QuotesProviderEnum QuotesProviderType { get; set; }
 
         public List<KeyValuePair<string, string>> Parameters { get; set; } = new List<KeyValuePair<string, string>>();
     }

@@ -8,7 +8,7 @@ namespace QuotesService.ApiPrivate.Services
 {
     public interface IQuotesProviderRemoteCallService
     {
-        Task<CheckGetQuotesResponse> CheckGetQuotes(CheckGetQuotesRequest request);
+        Task<StandartResponse> CheckGetQuotes(CheckGetQuotesRequest request);
 
         Task<GetQuotesResponse> GetQuotes(GetQuotesRequest request);
 

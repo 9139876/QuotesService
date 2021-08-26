@@ -3,18 +3,15 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
-using System.Resources;
-using System.Text;
 using System.Threading.Tasks;
 using CommonLibraries.Core.Extensions;
-using Newtonsoft.Json.Linq;
 using QuotesService.Api.Enum;
 using QuotesService.Api.Models;
 using QuotesService.Api.Models.RequestResponse;
 using QuotesService.ApiPrivate.Models.RequestResponse;
 using QuotesService.BL.Models;
-using QuotesService.BL.Static;
 using QuotesService.DAL.Entities;
+using QuotesService.DAL.Internal;
 using QuotesService.DAL.Repositories;
 
 namespace QuotesService.BL.Services.Implementation
@@ -23,12 +20,24 @@ namespace QuotesService.BL.Services.Implementation
     {
         private static readonly DateTime _zeroDt = new DateTime(1970, 1, 1);
         private readonly ITickersRepository _tickersRepository;
+        private readonly IQuotesProvidersRepository _quotesProvidersRepository;
+        private readonly ITickerTFsRepository _tickerTFsRepository;
+        private readonly IQuotesProvidersTasksRepository _quotesProvidersTasksRepository;
+        private readonly IQuotesDbContext _quotesDbContext;
 
         public YahooFinanceService(
-            ITickersRepository tickersRepository
+            ITickersRepository tickersRepository,
+            IQuotesProvidersRepository quotesProvidersRepository,
+            ITickerTFsRepository tickerTFsRepository,
+            IQuotesProvidersTasksRepository quotesProvidersTasksRepository,
+            IQuotesDbContext quotesDbContext
             )
         {
             _tickersRepository = tickersRepository;
+            _quotesProvidersRepository = quotesProvidersRepository;
+            _tickerTFsRepository = tickerTFsRepository;
+            _quotesProvidersTasksRepository = quotesProvidersTasksRepository;
+            _quotesDbContext = quotesDbContext;
         }
 
         public async Task<GetQuotesResponse> GetQuotes(GetQuotesRequest request)
@@ -47,44 +56,43 @@ namespace QuotesService.BL.Services.Implementation
             return await GetQuotes(url);
         }
 
-        public async Task<CheckGetQuotesResponse> CheckGetQuotes(CheckGetQuotesRequest request)
+        public async Task<StandartResponse> CheckGetQuotes(CheckGetQuotesRequest request)
         {
             try
             {
                 if (request.Parameters.Where(x => x.Key == nameof(YahooFinanceGetDataInfoModel.Symbol)).Any() == false)
                 {
-                    throw new InvalidOperationException();
+                    throw new InvalidOperationException($"Пропущен обязяательный параметр - {nameof(YahooFinanceGetDataInfoModel.Symbol)}");
                 }
 
                 var symbol = request.Parameters.Single(x => x.Key == nameof(YahooFinanceGetDataInfoModel.Symbol)).Value;
 
-                var url = GetQuotesURL(symbol, request.StartDate, request.StartDate.AddMonths(1), TimeFrameEnum.D1);
+                var url = GetQuotesURL(symbol, DateTime.Now.AddMonths(-1), DateTime.Now, TimeFrameEnum.D1);
 
                 var quotes = await GetQuotes(url);
 
                 if (quotes.Quotes.Any())
                 {
-                    return new CheckGetQuotesResponse()
+                    return new StandartResponse()
                     {
-                        IsSuccess = true,
-                        StartDate = quotes.Quotes.Select(x => x.Date).Min()
+                        IsSuccess = true
                     };
                 }
                 else
                 {
-                    return new CheckGetQuotesResponse()
+                    return new StandartResponse()
                     {
                         IsSuccess = false,
-                        ErrorMessage = $"Для начальной даты {request.StartDate.ToString("d")} в течение месяца не было ни одной котировки"
+                        Message = $"В течение последнего месяца не было ни одной котировки"
                     };
                 }
             }
             catch (Exception e)
             {
-                return new CheckGetQuotesResponse()
+                return new StandartResponse()
                 {
                     IsSuccess = false,
-                    ErrorMessage = e.Message
+                    Message = e.Message
                 };
             }
         }
@@ -95,7 +103,7 @@ namespace QuotesService.BL.Services.Implementation
 
             var getDataInfo = ticker.ProviderGetDataInfo?.Deserialize<YahooFinanceGetDataInfoModel>() ?? new YahooFinanceGetDataInfoModel();
 
-            return ModelPropertiesCollectionConverter.ModelToPropertiesCollection(getDataInfo);
+            return getDataInfo.ToPropertiesCollection();
         }
 
         public async Task<StandartResponse> SetQuotesProviderParameters(SetQuotesProviderParametersRequest request)
@@ -109,12 +117,37 @@ namespace QuotesService.BL.Services.Implementation
                     throw new InvalidOperationException($"Для инструмента {request.TickerName} рынок {request.MarketName} уже установлены параметры поставщика котировок, изменять их нельзя, нужно создать новый инструмент");
                 }
 
-                var getDataInfo = ModelPropertiesCollectionConverter.PropertiesCollectionToModel<YahooFinanceGetDataInfoModel>(request.Parameters).Serialize();
+                var quotesProvider = await _quotesProvidersRepository.GetQuotesProviderByType(request.QuotesProviderType);
+                quotesProvider.RequiredNotNull(nameof(quotesProvider), request.QuotesProviderType);
 
-                if (ticker.ProviderGetDataInfo != getDataInfo)
+                ticker.QuotesProviderId = quotesProvider.Id;
+                ticker.ProviderGetDataInfo = request.Parameters.ToModel<YahooFinanceGetDataInfoModel>().Serialize();
+
+                var tasks = new List<QuotesProviderTaskEntity>();
+
+                foreach(var tf in GetAvailableTimeFrames())
                 {
-                    ticker.ProviderGetDataInfo = getDataInfo;
+                    var ttf = await _tickerTFsRepository.GetByTickerIdAndTF(ticker.Id, tf);
+                    ttf.RequiredNotNull(nameof(ttf), new { ticker.Id, tf });
+
+                    tasks.Add(new QuotesProviderTaskEntity()
+                    {
+                        TickerTFId=ttf.Id,
+                        UpdatePeriodInSecond = 3600,
+                        IsActive = false
+                    });
+                }
+
+                using(var transaction = _quotesDbContext.BeginTransaction())
+                {
                     await _tickersRepository.UpdateAsync(ticker);
+
+                    foreach(var task in tasks)
+                    {
+                        await _quotesProvidersTasksRepository.InsertAsync(task);
+                    }
+
+                    transaction.Commit();
                 }
 
                 return new StandartResponse() { IsSuccess = true };
@@ -128,6 +161,16 @@ namespace QuotesService.BL.Services.Implementation
                 };
             }
 
+        }
+
+        public List<TimeFrameEnum> GetAvailableTimeFrames()
+        {
+            return new List<TimeFrameEnum>
+            {
+                TimeFrameEnum.D1,
+                TimeFrameEnum.W1,
+                TimeFrameEnum.M1
+            };
         }
 
         #region private static

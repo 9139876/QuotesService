@@ -1,6 +1,5 @@
 ﻿using CommonLibraries.Core.Extensions;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
 using QuotesService.Api.Enum;
 using QuotesService.Api.Models.RequestResponse;
 using QuotesService.ApiPrivate.Models;
@@ -14,9 +13,7 @@ using QuotesService.WebApp.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace QuotesService.WebApp.Controllers.Api
 {
@@ -226,13 +223,13 @@ namespace QuotesService.WebApp.Controllers.Api
         }
 
         [HttpPost("get-ticker-info")]
-        public async Task<TickerInfoResponse> GetTickerInfo([FromBody] TickerAndMarketRequest request)
+        public async Task<TickerInfoModel> GetTickerInfo([FromBody] TickerAndMarketRequest request)
         {
             request.RequiredNotNull(nameof(request));
 
             if (string.IsNullOrEmpty(request.MarketName) || string.IsNullOrEmpty(request.TickerName))
             {
-                return new TickerInfoResponse()
+                return new TickerInfoModel()
                 {
                     Status = new StandartResponse()
                     {
@@ -246,7 +243,7 @@ namespace QuotesService.WebApp.Controllers.Api
 
             if (existingTicker == null)
             {
-                return new TickerInfoResponse()
+                return new TickerInfoModel()
                 {
                     Status = new StandartResponse()
                     {
@@ -272,7 +269,7 @@ namespace QuotesService.WebApp.Controllers.Api
                 });
             }
 
-            var result = new TickerInfoResponse()
+            var result = new TickerInfoModel()
             {
                 MarketName = request.MarketName,
                 TickerName = request.TickerName,
@@ -306,7 +303,7 @@ namespace QuotesService.WebApp.Controllers.Api
         }
 
         [HttpPost("set-ticker-info")]
-        public async Task<StandartResponse> SetTickerInfo([FromBody] TickerInfoResponse tickerInfo)
+        public async Task<StandartResponse> SetTickerInfo([FromBody] TickerInfoModel tickerInfo)
         {
             tickerInfo.RequiredNotNull(nameof(tickerInfo));
 
@@ -392,7 +389,7 @@ namespace QuotesService.WebApp.Controllers.Api
         }
 
         [HttpPost("check-get-quotes")]
-        public async Task<CheckGetQuotesResponse> CheckGetQuotes([FromBody] CheckGetQuotesRequest request)
+        public async Task<StandartResponse> CheckGetQuotes([FromBody] CheckGetQuotesRequest request)
         {
             request.RequiredNotNull(nameof(request));
 
@@ -427,6 +424,17 @@ namespace QuotesService.WebApp.Controllers.Api
         public async Task<StandartResponse> SetQuotesProviderParameters([FromBody] SetQuotesProviderParametersRequest request)
         {
             request.RequiredNotNull(nameof(request));
+
+            var check = await CheckGetQuotes(new CheckGetQuotesRequest() 
+            {
+                QuotesProviderType = request.QuotesProviderType,
+                Parameters = request.Parameters
+            });
+
+            if(check.IsSuccess != true)
+            {
+                return check;
+            }
 
             return await _quotesProviderRemoteCallService.SetQuotesProviderParameters(request);
         }

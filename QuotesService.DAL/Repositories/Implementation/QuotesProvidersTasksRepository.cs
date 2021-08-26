@@ -1,5 +1,6 @@
 ﻿using CommonLibraries.EF.Implementation;
 using Microsoft.EntityFrameworkCore;
+using QuotesService.Api.Enum;
 using QuotesService.DAL.Entities;
 using QuotesService.DAL.Internal;
 using System;
@@ -17,6 +18,18 @@ namespace QuotesService.DAL.Repositories.Implementation
         public QuotesProvidersTasksRepository(IQuotesDbContext dbcontext) : base(dbcontext.QuotesProvidersTasks)
         {
             _dbcontext = dbcontext;
+        }
+
+        public async Task<Dictionary<TimeFrameEnum, QuotesProviderTaskEntity>> GetTasksByTickerId(int tickerId)
+        {
+            var query = from qpt in _dbcontext.QuotesProvidersTasks
+                        join ttf in _dbcontext.TickerTFs on qpt.TickerTFId equals ttf.Id
+                        where ttf.TickerId == tickerId
+                        select new { ttf.TimeFrame, qpt };
+
+            var queryResult = await query.ToListAsync();
+
+            return queryResult.ToDictionary(x => x.TimeFrame, x => x.qpt);
         }
     }
 }

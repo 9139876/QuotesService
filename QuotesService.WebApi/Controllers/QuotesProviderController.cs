@@ -32,11 +32,11 @@ namespace QuotesService.WebApi.Controllers
 
         [HttpPost]
         [Route("check-get-quotes")]
-        public async Task<CheckGetQuotesResponse> CheckGetQuotes([FromBody] CheckGetQuotesRequest request)
+        public async Task<StandartResponse> CheckGetQuotes([FromBody] CheckGetQuotesRequest request)
         {
             request.RequiredNotNull(nameof(request));
 
-            var service = _strategyService.GetInstance(request.QuotesProvider);
+            var service = _strategyService.GetInstance(request.QuotesProviderType);
 
             return await service.CheckGetQuotes(request);
         }
@@ -81,6 +81,8 @@ namespace QuotesService.WebApi.Controllers
                 var currentQuotesProvider = await _quotesProvidersRepository.GetQuotesProviderById(existingTicker.QuotesProviderId.Value);
                 currentQuotesProvider.RequiredNotNull(nameof(currentQuotesProvider), existingTicker.QuotesProviderId);
 
+                result.QuotesProviderAssigned = true;
+
                 result.CurrentQuotesProvider = new QuotesProvider()
                 {
                     QuotesProviderName = currentQuotesProvider.Name,
@@ -108,7 +110,7 @@ namespace QuotesService.WebApi.Controllers
         {
             request.RequiredNotNull(nameof(request));
 
-            var service = _strategyService.GetInstance(request.QuotesProvider);
+            var service = _strategyService.GetInstance(request.QuotesProviderType);
 
             return await service.SetQuotesProviderParameters(request);
         }

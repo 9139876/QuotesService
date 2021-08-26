@@ -1,0 +1,53 @@
+﻿<!doctype html>
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width">
+	<title>Менеджер котировок</title>
+</head>
+
+<body>
+	<div>
+		@* Header *@
+		<div id="header">
+			<h2>Header</h2>
+		</div>
+
+		@* Body *@
+		<div id="body" class="container">
+			<market-component></market-component>
+		</div>
+
+		@* Footer *@
+		<div id="footer" class="position-absolute bottom-0 start-0">
+			<h2>Footer</h2>
+		</div>
+	</div>
+
+	<link rel="stylesheet" href="~/css/bootstrap.min.css" asp-append-version="true" />
+
+	<script src="~/js/lib/axios.min.js" asp-append-version="true"></script>
+	<script src="~/js/lib/vue.min.js" asp-append-version="true"></script>
+	<script src="~/js/lib/bootstrap.min.js" asp-append-version="true"></script>
+
+	<script src="~/js/main.js" asp-append-version="true"></script>
+
+	<script>
+		const getMarketsUrl = '/quotes-getter-api/get-markets';
+		const addMarketUrl = '/quotes-getter-api/add-market';
+		const deleteMarketUrl = '/quotes-getter-api/delete-market';
+		const addTickerUrl = '/quotes-getter-api/add-ticker';
+		const deleteTickerUrl = '/quotes-getter-api/delete-ticker';
+		const getTickerInfoUrl = '/quotes-getter-api/get-ticker-info';
+		const setTickerInfoUrl = '/quotes-getter-api/set-ticker-info';
+
+		const checkGetQuotesUrl = '/quotes-getter-api/check-get-quotes';
+		const getQuotesUrl = '/quotes-getter-api/get-quotes';
+		const getQuotesProviderUrl = '/quotes-getter-api/get-quotes-provider';
+		const getQuotesProviderParametersUrl = '/quotes-getter-api/get-quotes-provider-parameters';
+		const setQuotesProviderParametersUrl = '/quotes-getter-api/set-quotes-provider-parameters';
+	</script>
+</body>
+
+</html>

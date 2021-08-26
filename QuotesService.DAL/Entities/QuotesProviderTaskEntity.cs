@@ -16,8 +16,10 @@ namespace QuotesService.DAL.Entities
 
         public int TickerTFId { get; set; }
 
-        public int UpdatePeriod { get; set; }
+        public bool IsActive { get; set; }
 
-        public DateTime LastUpdateDate { get; set; }
+        public int UpdatePeriodInSecond { get; set; }
+
+        public DateTime? LastUpdateDate { get; set; }
     }
 }

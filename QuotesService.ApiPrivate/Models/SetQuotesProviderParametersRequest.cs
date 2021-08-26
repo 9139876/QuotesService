@@ -9,7 +9,7 @@ namespace QuotesService.ApiPrivate.Models.RequestResponse
 {
     public class SetQuotesProviderParametersRequest
     {
-        public QuotesProviderEnum QuotesProvider { get; set; }
+        public QuotesProviderEnum QuotesProviderType { get; set; }
 
         public string TickerName { get; set; }
 

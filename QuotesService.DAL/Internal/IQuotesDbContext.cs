@@ -8,8 +8,6 @@ namespace QuotesService.DAL.Internal
     {
         DbSet<MarketEntity> Markets { get; set; }
 
-        DbSet<QuotesProviderTFEntity> QuotesProviderTFs { get; set; }
-
         DbSet<QuotesProviderTaskEntity> QuotesProvidersTasks { get; set; }
 
         DbSet<QuoteEntity> Quotes { get; set; }
