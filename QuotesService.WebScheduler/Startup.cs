@@ -1,3 +1,4 @@
+using CommonLibraries.BackgroundWorker.Extensions;
 using CommonLibraries.Core.Extensions;
 using CommonLibraries.Web;
 using Microsoft.AspNetCore.Builder;
@@ -39,6 +40,8 @@ namespace QuotesService.WebScheduler
         protected override void ConfigureServiceCollections(IServiceCollection services)
         {
             services.RegisterDbContexts(Configuration);
+
+            services.AddBackgroundWorkers<Startup>(Configuration);
 
             services.RegisterAssemblyServiceAndRepositoryByMember<BL.PlaceboRegistration>();
             services.RegisterAssemblyServiceAndRepositoryByMember<DAL.PlaceboRegistration>();

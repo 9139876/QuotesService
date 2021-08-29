@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using CommonLibraries.RemoteCall;
 using CommonLibraries.RemoteCall.Services;
 using Microsoft.Extensions.Configuration;
+using QuotesService.Api.Models;
 using QuotesService.Api.Models.RequestResponse;
 using QuotesService.ApiPrivate.Models;
 using QuotesService.ApiPrivate.Models.RequestResponse;
@@ -21,11 +22,11 @@ namespace QuotesService.ApiPrivate.Services.Implementation
         public async Task<StandartResponse> CheckGetQuotes(CheckGetQuotesRequest request)
             => await ExecutePostAsync<StandartResponse, CheckGetQuotesRequest>("api/quotes-provider/check-get-quotes", request);
 
-        public async Task<GetQuotesResponse> GetQuotes(GetQuotesRequest request)
-            => await ExecutePostAsync<GetQuotesResponse, GetQuotesRequest>("api/quotes-provider/get-quotes", request);
+        public async Task<GetQuotesResponse> GetQuotes(GetQuotesWithQPRequest request)
+            => await ExecutePostAsync<GetQuotesResponse, GetQuotesWithQPRequest>("api/quotes-provider/get-quotes", request);
 
-        public async Task<GetQuotesProviderResponse> GetQuotesProvider(TickerAndMarketRequest request)
-            => await ExecutePostAsync<GetQuotesProviderResponse, TickerAndMarketRequest>("api/quotes-provider/get-quotes-provider", request);
+        public async Task<GetQuotesProviderResponse> GetQuotesProvider(TickerAndMarket request)
+            => await ExecutePostAsync<GetQuotesProviderResponse, TickerAndMarket>("api/quotes-provider/get-quotes-provider", request);
 
         public async Task<List<KeyValuePair<string, string>>> GetQuotesProviderParameters(GetQuotesProviderParametersRequest request)
             => await ExecutePostAsync<List<KeyValuePair<string, string>>, GetQuotesProviderParametersRequest>("api/quotes-provider/get-quotes-provider-parameters", request);

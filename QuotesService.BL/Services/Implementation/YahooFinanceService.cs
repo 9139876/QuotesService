@@ -10,8 +10,10 @@ using QuotesService.Api.Models;
 using QuotesService.Api.Models.RequestResponse;
 using QuotesService.ApiPrivate.Models.RequestResponse;
 using QuotesService.BL.Models;
+using QuotesService.BL.Static;
 using QuotesService.DAL.Entities;
 using QuotesService.DAL.Internal;
+using QuotesService.DAL.Models;
 using QuotesService.DAL.Repositories;
 
 namespace QuotesService.BL.Services.Implementation
@@ -23,6 +25,7 @@ namespace QuotesService.BL.Services.Implementation
         private readonly IQuotesProvidersRepository _quotesProvidersRepository;
         private readonly ITickerTFsRepository _tickerTFsRepository;
         private readonly IQuotesProvidersTasksRepository _quotesProvidersTasksRepository;
+        private readonly IQuotesRepository _quotesRepository;
         private readonly IQuotesDbContext _quotesDbContext;
 
         public YahooFinanceService(
@@ -30,6 +33,7 @@ namespace QuotesService.BL.Services.Implementation
             IQuotesProvidersRepository quotesProvidersRepository,
             ITickerTFsRepository tickerTFsRepository,
             IQuotesProvidersTasksRepository quotesProvidersTasksRepository,
+            IQuotesRepository quotesRepository,
             IQuotesDbContext quotesDbContext
             )
         {
@@ -37,7 +41,42 @@ namespace QuotesService.BL.Services.Implementation
             _quotesProvidersRepository = quotesProvidersRepository;
             _tickerTFsRepository = tickerTFsRepository;
             _quotesProvidersTasksRepository = quotesProvidersTasksRepository;
+            _quotesRepository = quotesRepository;
             _quotesDbContext = quotesDbContext;
+        }
+
+        public async Task<GetQuotesResponse> GetLastBatchQuotes(GetBatchQuotesRequest request)
+        {
+            var getLastQuoteRequest = new GetSpecificQuoteRequest()
+            {
+                MarketName = request.MarketName,
+                TickerName = request.TickerName,
+                TimeFrame = request.TimeFrame
+            };
+            var lastQuote = await _quotesRepository.GetLastQuote(getLastQuoteRequest);
+
+            var getQuotesRequest = new GetQuotesWithQPRequest()
+            {
+                QuotesProvider = QuotesProviderEnum.YahooFinance,
+                MarketName = request.MarketName,
+                TickerName = request.TickerName,
+                TimeFrame = request.TimeFrame
+            };
+
+            if (lastQuote != null)
+            {
+                getQuotesRequest.StartDate = lastQuote.Date;
+            }
+            else
+            {
+                getQuotesRequest.StartDate = await QuotesAuxiliary.SearchFirstDate(request, this);
+            }
+
+            getQuotesRequest.EndDate = QuotesAuxiliary.GetEndBatchDate(getQuotesRequest.StartDate, request.TimeFrame);
+
+            var result = await GetQuotes(getQuotesRequest);
+
+            return result;
         }
 
         public async Task<GetQuotesResponse> GetQuotes(GetQuotesRequest request)
@@ -125,24 +164,24 @@ namespace QuotesService.BL.Services.Implementation
 
                 var tasks = new List<QuotesProviderTaskEntity>();
 
-                foreach(var tf in GetAvailableTimeFrames())
+                foreach (var tf in GetAvailableTimeFrames())
                 {
                     var ttf = await _tickerTFsRepository.GetByTickerIdAndTF(ticker.Id, tf);
                     ttf.RequiredNotNull(nameof(ttf), new { ticker.Id, tf });
 
                     tasks.Add(new QuotesProviderTaskEntity()
                     {
-                        TickerTFId=ttf.Id,
+                        TickerTFId = ttf.Id,
                         UpdatePeriodInSecond = 3600,
                         IsActive = false
                     });
                 }
 
-                using(var transaction = _quotesDbContext.BeginTransaction())
+                using (var transaction = _quotesDbContext.BeginTransaction())
                 {
                     await _tickersRepository.UpdateAsync(ticker);
 
-                    foreach(var task in tasks)
+                    foreach (var task in tasks)
                     {
                         await _quotesProvidersTasksRepository.InsertAsync(task);
                     }
@@ -191,7 +230,7 @@ namespace QuotesService.BL.Services.Implementation
         private static string GetQuotesURL(string tickerSymbol, DateTime start, DateTime end, TimeFrameEnum timeFrame)
         {
             start = new DateTime(start.Year, start.Month, start.Day, 0, 0, 0);
-            end = new DateTime(end.Year, end.Month, end.Day, 20, 0, 0);
+            end = new DateTime(end.Year, end.Month, end.Day, 23, 59, 59);
 
             return $"https://query1.finance.yahoo.com/v7/finance/download/{tickerSymbol}?period1={GetDateValue(start)}&period2={GetDateValue(end)}&interval={GetTimeFrameCode(timeFrame)}&events=history&includeAdjustedClose=true";
         }
@@ -238,7 +277,7 @@ namespace QuotesService.BL.Services.Implementation
 
         private async Task<TickerEntity> GetTicker(string tickerName, string marketName)
         {
-            var tickerAndMarketRequest = new TickerAndMarketRequest()
+            var tickerAndMarketRequest = new TickerAndMarket()
             {
                 MarketName = marketName,
                 TickerName = tickerName

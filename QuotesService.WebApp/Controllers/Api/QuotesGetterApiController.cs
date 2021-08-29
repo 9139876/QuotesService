@@ -1,6 +1,7 @@
 ﻿using CommonLibraries.Core.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using QuotesService.Api.Enum;
+using QuotesService.Api.Models;
 using QuotesService.Api.Models.RequestResponse;
 using QuotesService.ApiPrivate.Models;
 using QuotesService.ApiPrivate.Models.RequestResponse;
@@ -127,7 +128,7 @@ namespace QuotesService.WebApp.Controllers.Api
         }
 
         [HttpPost("add-ticker")]
-        public async Task<StandartResponse> AddTicker([FromBody] TickerAndMarketRequest request)
+        public async Task<StandartResponse> AddTicker([FromBody] TickerAndMarket request)
         {
             request.RequiredNotNull(nameof(request));
 
@@ -193,7 +194,7 @@ namespace QuotesService.WebApp.Controllers.Api
         }
 
         [HttpPost("delete-ticker")]
-        public async Task<StandartResponse> DeleteTicker([FromBody] TickerAndMarketRequest request)
+        public async Task<StandartResponse> DeleteTicker([FromBody] TickerAndMarket request)
         {
             request.RequiredNotNull(nameof(request));
 
@@ -223,7 +224,7 @@ namespace QuotesService.WebApp.Controllers.Api
         }
 
         [HttpPost("get-ticker-info")]
-        public async Task<TickerInfoModel> GetTickerInfo([FromBody] TickerAndMarketRequest request)
+        public async Task<TickerInfoModel> GetTickerInfo([FromBody] TickerAndMarket request)
         {
             request.RequiredNotNull(nameof(request));
 
@@ -316,7 +317,7 @@ namespace QuotesService.WebApp.Controllers.Api
                 };
             }
 
-            var existingTicker = await _tickersRepository.GetByTickerAndMarket(new TickerAndMarketRequest()
+            var existingTicker = await _tickersRepository.GetByTickerAndMarket(new TickerAndMarket()
             {
                 MarketName = tickerInfo.MarketName,
                 TickerName = tickerInfo.TickerName
@@ -397,7 +398,7 @@ namespace QuotesService.WebApp.Controllers.Api
         }
 
         [HttpPost("get-quotes")]
-        public async Task<GetQuotesResponse> GetQuotes([FromBody] GetQuotesRequest request)
+        public async Task<GetQuotesResponse> GetQuotes([FromBody] GetQuotesWithQPRequest request)
         {
             request.RequiredNotNull(nameof(request));
 
@@ -405,7 +406,7 @@ namespace QuotesService.WebApp.Controllers.Api
         }
 
         [HttpPost("get-quotes-provider")]
-        public async Task<GetQuotesProviderResponse> GetQuotesProvider([FromBody] TickerAndMarketRequest request)
+        public async Task<GetQuotesProviderResponse> GetQuotesProvider([FromBody] TickerAndMarket request)
         {
             request.RequiredNotNull(nameof(request));
 

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace QuotesService.Api.Models.RequestResponse
+namespace QuotesService.Api.Models
 {
-    public class TickerAndMarketRequest
+    public class TickerAndMarket
     {
         public string MarketName { get; set; }
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CommonLibraries.Core.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using QuotesService.Api.Models;
 using QuotesService.Api.Models.RequestResponse;
 using QuotesService.ApiPrivate.Models;
 using QuotesService.ApiPrivate.Models.RequestResponse;
@@ -43,7 +44,7 @@ namespace QuotesService.WebApi.Controllers
 
         [HttpPost]
         [Route("get-quotes")]
-        public async Task<GetQuotesResponse> GetQuotes([FromBody] GetQuotesRequest request)
+        public async Task<GetQuotesResponse> GetQuotes([FromBody] GetQuotesWithQPRequest request)
         {
             request.RequiredNotNull(nameof(request));
 
@@ -54,7 +55,7 @@ namespace QuotesService.WebApi.Controllers
 
         [HttpPost]
         [Route("get-quotes-provider")]
-        public async Task<GetQuotesProviderResponse> GetQuotesProvider([FromBody] TickerAndMarketRequest request)
+        public async Task<GetQuotesProviderResponse> GetQuotesProvider([FromBody] TickerAndMarket request)
         {
             request.RequiredNotNull(nameof(request));
 

@@ -1,5 +1,6 @@
 ﻿using CommonLibraries.Core.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using QuotesService.Api.Models;
 using QuotesService.Api.Models.RequestResponse;
 using QuotesService.DAL.Entities;
 using QuotesService.DAL.Internal;
@@ -30,7 +31,7 @@ namespace QuotesService.WebApp.Controllers.Api
         }
 
         [HttpPost("get-quotes-provider-tasks")]
-        public async Task<QuotesProviderTasksModel> GetQuotesProviderTasks([FromBody] TickerAndMarketRequest request)
+        public async Task<QuotesProviderTasksModel> GetQuotesProviderTasks([FromBody] TickerAndMarket request)
         {
             request.RequiredNotNull(nameof(request));
 
@@ -95,7 +96,7 @@ namespace QuotesService.WebApp.Controllers.Api
                 };
             }
 
-            var existingTicker = await _tickersRepository.GetByTickerAndMarket(new TickerAndMarketRequest()
+            var existingTicker = await _tickersRepository.GetByTickerAndMarket(new TickerAndMarket()
             {
                 MarketName = request.MarketName,
                 TickerName = request.TickerName

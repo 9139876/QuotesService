@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using QuotesService.Api.Models;
 
 namespace QuotesService.DAL.Repositories.Implementation
 {
@@ -23,7 +24,7 @@ namespace QuotesService.DAL.Repositories.Implementation
             return await DbSet.ToListAsync();
         }
 
-        public async Task<TickerEntity> GetByTickerAndMarket(TickerAndMarketRequest request)
+        public async Task<TickerEntity> GetByTickerAndMarket(TickerAndMarket request)
         {
             var query = from tickers in _dbcontext.Tickers
                         join markets in _dbcontext.Markets on tickers.MarketId equals markets.Id

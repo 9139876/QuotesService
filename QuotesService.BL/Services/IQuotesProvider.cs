@@ -13,6 +13,8 @@ namespace QuotesService.BL.Services
     {
         Task<GetQuotesResponse> GetQuotes(GetQuotesRequest request);
 
+        Task<GetQuotesResponse> GetLastBatchQuotes(GetBatchQuotesRequest request);
+
         Task<StandartResponse> CheckGetQuotes(CheckGetQuotesRequest request);
 
         Task<List<KeyValuePair<string, string>>> GetQuotesProviderParameters(GetQuotesProviderParametersRequest request);
