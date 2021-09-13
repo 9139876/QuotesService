@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using QuotesService.Api.Enum;
 using QuotesService.Api.Models.RequestResponse;
-using QuotesService.ApiPrivate.Models.RequestResponse;
+using QuotesService.BL.Models;
 
 namespace QuotesService.BL.Services
 {

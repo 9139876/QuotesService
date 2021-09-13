@@ -9,7 +9,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\QuotesService.ApiPrivate\QuotesService.ApiPrivate.csproj" />
     <ProjectReference Include="..\QuotesService.BL\QuotesService.BL.csproj" />
   </ItemGroup>
 
@@ -32,6 +31,10 @@
     <Content Update="C:\Users\Andrew\.nuget\packages\commonlibraries.web\1.0.4\contentFiles\any\net5.0\nlog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>

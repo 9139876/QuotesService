@@ -8,12 +8,10 @@ using CommonLibraries.Core.Extensions;
 using QuotesService.Api.Enum;
 using QuotesService.Api.Models;
 using QuotesService.Api.Models.RequestResponse;
-using QuotesService.ApiPrivate.Models.RequestResponse;
 using QuotesService.BL.Models;
 using QuotesService.BL.Static;
 using QuotesService.DAL.Entities;
 using QuotesService.DAL.Internal;
-using QuotesService.DAL.Models;
 using QuotesService.DAL.Repositories;
 
 namespace QuotesService.BL.Services.Implementation

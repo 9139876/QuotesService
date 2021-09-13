@@ -1,11 +1,7 @@
 ﻿using QuotesService.Api.Enum;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace QuotesService.ApiPrivate.Models.RequestResponse
+namespace QuotesService.BL.Models
 {
     public class SetQuotesProviderParametersRequest
     {

@@ -3,9 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using QuotesService.Api.Enum;
 using QuotesService.Api.Models;
 using QuotesService.Api.Models.RequestResponse;
-using QuotesService.ApiPrivate.Models;
-using QuotesService.ApiPrivate.Models.RequestResponse;
-using QuotesService.ApiPrivate.Services;
+using QuotesService.BL.Models;
+using QuotesService.BL.Services;
 using QuotesService.DAL.Entities;
 using QuotesService.DAL.Internal;
 using QuotesService.DAL.Models;
@@ -28,7 +27,7 @@ namespace QuotesService.WebApp.Controllers.Api
         private readonly ITickerTFsRepository _tickerTFsRepository;
         private readonly IQuotesProvidersRepository _quotesProvidersRepository;
         private readonly IQuotesDbContext _quotesDbContext;
-        private readonly IQuotesProviderRemoteCallService _quotesProviderRemoteCallService;
+        private readonly IStrategyService _strategyService;
 
         public QuotesGetterApiController(
             IMarketsRepository marketsRepository,
@@ -38,7 +37,7 @@ namespace QuotesService.WebApp.Controllers.Api
             ITickerTFsRepository tickerTFsRepository,
             IQuotesProvidersRepository quotesProvidersRepository,
             IQuotesDbContext quotesDbContext,
-            IQuotesProviderRemoteCallService quotesProviderRemoteCallService)
+            IStrategyService strategyService)
         {
             _marketsRepository = marketsRepository;
             _tickersRepository = tickersRepository;
@@ -47,7 +46,7 @@ namespace QuotesService.WebApp.Controllers.Api
             _tickerTFsRepository = tickerTFsRepository;
             _quotesProvidersRepository = quotesProvidersRepository;
             _quotesDbContext = quotesDbContext;
-            _quotesProviderRemoteCallService = quotesProviderRemoteCallService;
+            _strategyService = strategyService;
         }
 
         [HttpGet("get-markets")]
@@ -394,7 +393,9 @@ namespace QuotesService.WebApp.Controllers.Api
         {
             request.RequiredNotNull(nameof(request));
 
-            return await _quotesProviderRemoteCallService.CheckGetQuotes(request);
+            var service = _strategyService.GetInstance(request.QuotesProviderType);
+
+            return await service.CheckGetQuotes(request);
         }
 
         [HttpPost("get-quotes-provider")]
@@ -402,7 +403,39 @@ namespace QuotesService.WebApp.Controllers.Api
         {
             request.RequiredNotNull(nameof(request));
 
-            return await _quotesProviderRemoteCallService.GetQuotesProvider(request);
+            var existingTicker = await _tickersRepository.GetByTickerAndMarket(request);
+
+            if (existingTicker == null)
+            {
+                throw new InvalidOperationException($"Ticker {request.TickerName} in market {request.MarketName} not exsit");
+            }
+
+            var allQuotesProviders = await _quotesProvidersRepository.GetAllQuotesProviders();
+
+            var result = new GetQuotesProviderResponse()
+            {
+                AllQuotesProviders = allQuotesProviders.Select(x => new QuotesProvider()
+                {
+                    QuotesProviderName = x.Name,
+                    QuotesProviderType = x.QuotesProviderType
+                }).ToList()
+            };
+
+            if (existingTicker.QuotesProviderId > 0)
+            {
+                var currentQuotesProvider = await _quotesProvidersRepository.GetQuotesProviderById(existingTicker.QuotesProviderId.Value);
+                currentQuotesProvider.RequiredNotNull(nameof(currentQuotesProvider), existingTicker.QuotesProviderId);
+
+                result.QuotesProviderAssigned = true;
+
+                result.CurrentQuotesProvider = new QuotesProvider()
+                {
+                    QuotesProviderName = currentQuotesProvider.Name,
+                    QuotesProviderType = currentQuotesProvider.QuotesProviderType
+                };
+            }
+
+            return result;
         }
 
         [HttpPost("get-quotes-provider-parameters")]
@@ -410,7 +443,9 @@ namespace QuotesService.WebApp.Controllers.Api
         {
             request.RequiredNotNull(nameof(request));
 
-            return await _quotesProviderRemoteCallService.GetQuotesProviderParameters(request);
+            var service = _strategyService.GetInstance(request.QuotesProviderType);
+
+            return await service.GetQuotesProviderParameters(request);
         }
 
         [HttpPost("set-quotes-provider-parameters")]
@@ -429,7 +464,9 @@ namespace QuotesService.WebApp.Controllers.Api
                 return check;
             }
 
-            return await _quotesProviderRemoteCallService.SetQuotesProviderParameters(request);
+            var service = _strategyService.GetInstance(request.QuotesProviderType);
+
+            return await service.SetQuotesProviderParameters(request);
         }
     }
 }

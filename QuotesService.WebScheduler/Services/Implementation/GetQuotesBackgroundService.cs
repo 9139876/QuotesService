@@ -55,8 +55,6 @@ namespace QuotesService.WebScheduler.Services.Implementation
 
             var quotesProviderType = await _quotesProvidersTasksRepository.GetQuotesProviderType(item);
 
-            var service = _strategyService.GetInstance(quotesProviderType);
-
             var quotesProviderTimeFrame = await _quotesProvidersTasksRepository.GetQuotesProviderTimeFrame(item);
 
             var tickerAndMarket = await _quotesProvidersTasksRepository.GetQuotesProviderTickerAndMarket(item);
@@ -68,6 +66,8 @@ namespace QuotesService.WebScheduler.Services.Implementation
                 MarketName = tickerAndMarket.MarketName,
                 TimeFrame = quotesProviderTimeFrame,
             };
+
+            var service = _strategyService.GetInstance(quotesProviderType);
 
             var quotes = (await service.GetLastBatchQuotes(quotesRequest))?.Quotes;
             quotes.RequiredNotNull(nameof(quotes), quotesRequest);
