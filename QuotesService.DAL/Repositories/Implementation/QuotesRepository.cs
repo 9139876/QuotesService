@@ -19,7 +19,7 @@ namespace QuotesService.DAL.Repositories.Implementation
             _dbcontext = dbcontext;
         }
 
-        public async Task<QuoteEntity> GetLastQuote(GetSpecificQuoteRequest request)
+        public async Task<QuoteEntity> GetLastQuote(TickerMarketTimeFrame request)
         {
             var query = from q in _dbcontext.Quotes
                         join ttf in _dbcontext.TickerTFs on q.ParentTickerTFId equals ttf.Id
@@ -39,9 +39,9 @@ namespace QuotesService.DAL.Repositories.Implementation
                         join ttf in _dbcontext.TickerTFs on q.ParentTickerTFId equals ttf.Id
                         join t in _dbcontext.Tickers on ttf.TickerId equals t.Id
                         join m in _dbcontext.Markets on t.MarketId equals m.Id
-                        where m.Name == request.MarketName
-                            && t.Name == request.TickerName
-                            && ttf.TimeFrame == request.TimeFrame
+                        where m.Name == request.TickerMarketTimeFrame.MarketName
+                            && t.Name == request.TickerMarketTimeFrame.TickerName
+                            && ttf.TimeFrame == request.TickerMarketTimeFrame.TimeFrame
                             && q.Date >= request.StartDate
                             && q.Date <= request.EndDate
                         select q;

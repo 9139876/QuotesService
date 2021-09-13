@@ -43,17 +43,6 @@ namespace QuotesService.WebApi.Controllers
         }
 
         [HttpPost]
-        [Route("get-quotes")]
-        public async Task<GetQuotesResponse> GetQuotes([FromBody] GetQuotesWithQPRequest request)
-        {
-            request.RequiredNotNull(nameof(request));
-
-            var service = _strategyService.GetInstance(request.QuotesProvider);
-
-            return await service.GetQuotes(request);
-        }
-
-        [HttpPost]
         [Route("get-quotes-provider")]
         public async Task<GetQuotesProviderResponse> GetQuotesProvider([FromBody] TickerAndMarket request)
         {

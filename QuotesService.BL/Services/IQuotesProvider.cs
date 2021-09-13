@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using QuotesService.Api.Enum;
 using QuotesService.Api.Models.RequestResponse;
@@ -11,9 +8,7 @@ namespace QuotesService.BL.Services
 {
     public interface IQuotesProvider
     {
-        Task<GetQuotesResponse> GetQuotes(GetQuotesRequest request);
-
-        Task<GetQuotesResponse> GetLastBatchQuotes(GetBatchQuotesRequest request);
+        Task<GetQuotesResponse> GetLastBatchQuotes(TickerMarketTimeFrame request);
 
         Task<StandartResponse> CheckGetQuotes(CheckGetQuotesRequest request);
 

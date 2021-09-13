@@ -45,22 +45,14 @@ namespace QuotesService.BL.Services.Implementation
             _quotesDbContext = quotesDbContext;
         }
 
-        public async Task<GetQuotesResponse> GetLastBatchQuotes(GetBatchQuotesRequest request)
-        {
-            var getLastQuoteRequest = new GetSpecificQuoteRequest()
-            {
-                MarketName = request.MarketName,
-                TickerName = request.TickerName,
-                TimeFrame = request.TimeFrame
-            };
-            var lastQuote = await _quotesRepository.GetLastQuote(getLastQuoteRequest);
+        public async Task<GetQuotesResponse> GetLastBatchQuotes(TickerMarketTimeFrame request)
+        {            
+            var lastQuote = await _quotesRepository.GetLastQuote(request);
 
             var getQuotesRequest = new GetQuotesWithQPRequest()
             {
                 QuotesProvider = QuotesProviderEnum.YahooFinance,
-                MarketName = request.MarketName,
-                TickerName = request.TickerName,
-                TimeFrame = request.TimeFrame
+                TickerMarketTimeFrame = request
             };
 
             if (lastQuote != null)
@@ -69,30 +61,17 @@ namespace QuotesService.BL.Services.Implementation
             }
             else
             {
-                getQuotesRequest.StartDate = await QuotesAuxiliary.SearchFirstDate(request, this);
+                getQuotesRequest.StartDate = await Auxiliary.SearchFirstDate(request, this.GetQuotes);
             }
 
-            getQuotesRequest.EndDate = QuotesAuxiliary.GetEndBatchDate(getQuotesRequest.StartDate, request.TimeFrame);
+            getQuotesRequest.EndDate = Auxiliary.GetEndBatchDate(getQuotesRequest.StartDate, request.TimeFrame);
 
-            var result = await GetQuotes(getQuotesRequest);
+            var getQuotesResponse = await GetQuotes(getQuotesRequest);
+
+            var result = new GetQuotesResponse() { Quotes = Auxiliary.CorrectQuotes(new QuotesCorrectRequest() { TimeFrame = request.TimeFrame, Quotes = getQuotesResponse }) };
 
             return result;
-        }
-
-        public async Task<GetQuotesResponse> GetQuotes(GetQuotesRequest request)
-        {
-            var ticker = await GetTicker(request.TickerName, request.MarketName);
-
-            var getDataInfo = ticker.ProviderGetDataInfo?.Deserialize<YahooFinanceGetDataInfoModel>();
-
-            if (getDataInfo == null)
-            {
-                throw new InvalidOperationException($"Ticker not have {nameof(getDataInfo)} - {ticker.Serialize()}");
-            }
-
-            var url = GetQuotesURL(getDataInfo.Symbol, request.StartDate, request.EndDate, request.TimeFrame);
-
-            return await GetQuotes(url);
+            ;
         }
 
         public async Task<StandartResponse> CheckGetQuotes(CheckGetQuotesRequest request)
@@ -110,7 +89,7 @@ namespace QuotesService.BL.Services.Implementation
 
                 var quotes = await GetQuotes(url);
 
-                if (quotes.Quotes.Any())
+                if (quotes.Any())
                 {
                     return new StandartResponse()
                     {
@@ -212,18 +191,34 @@ namespace QuotesService.BL.Services.Implementation
             };
         }
 
+        private async Task<List<QuoteModel>> GetQuotes(GetQuotesRequest request)
+        {
+            var ticker = await GetTicker(request.TickerMarketTimeFrame.TickerName, request.TickerMarketTimeFrame.MarketName);
+
+            var getDataInfo = ticker.ProviderGetDataInfo?.Deserialize<YahooFinanceGetDataInfoModel>();
+
+            if (getDataInfo == null)
+            {
+                throw new InvalidOperationException($"Ticker not have {nameof(getDataInfo)} - {ticker.Serialize()}");
+            }
+
+            var url = GetQuotesURL(getDataInfo.Symbol, request.StartDate, request.EndDate, request.TickerMarketTimeFrame.TimeFrame);
+
+            return await GetQuotes(url);
+        }
+
         #region private static
 
-        private static async Task<GetQuotesResponse> GetQuotes(string url)
+        private static async Task<List<QuoteModel>> GetQuotes(string url)
         {
-            var response = new GetQuotesResponse();
+            var data = string.Empty;
 
             using (var reader = new System.IO.StreamReader(new WebClient().OpenRead(url) ?? throw new InvalidOperationException($"Не удалось получить данные по адресу '{url}'")))
             {
-                var data = await reader.ReadToEndAsync();
-                response.Quotes = ParseQuotes(data);
-            }
+                data = await reader.ReadToEndAsync();
 
+            }
+            var response = ParseQuotes(data);
             return response;
         }
 

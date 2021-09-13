@@ -397,14 +397,6 @@ namespace QuotesService.WebApp.Controllers.Api
             return await _quotesProviderRemoteCallService.CheckGetQuotes(request);
         }
 
-        [HttpPost("get-quotes")]
-        public async Task<GetQuotesResponse> GetQuotes([FromBody] GetQuotesWithQPRequest request)
-        {
-            request.RequiredNotNull(nameof(request));
-
-            return await _quotesProviderRemoteCallService.GetQuotes(request);
-        }
-
         [HttpPost("get-quotes-provider")]
         public async Task<GetQuotesProviderResponse> GetQuotesProvider([FromBody] TickerAndMarket request)
         {

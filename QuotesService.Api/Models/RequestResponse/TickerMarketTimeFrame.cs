@@ -5,13 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QuotesService.DAL.Models
+namespace QuotesService.Api.Models.RequestResponse
 {
-    public class GetSpecificQuoteRequest
+    public class TickerMarketTimeFrame
     {
-        public string TickerName { get; set; }
-
         public string MarketName { get; set; }
+
+        public string TickerName { get; set; }
 
         public TimeFrameEnum TimeFrame { get; set; }
     }

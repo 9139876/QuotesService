@@ -11,8 +11,6 @@ namespace QuotesService.ApiPrivate.Services
     {
         Task<StandartResponse> CheckGetQuotes(CheckGetQuotesRequest request);
 
-        Task<GetQuotesResponse> GetQuotes(GetQuotesWithQPRequest request);
-
         Task<GetQuotesProviderResponse> GetQuotesProvider(TickerAndMarket request);
 
         Task<List<KeyValuePair<string, string>>> GetQuotesProviderParameters(GetQuotesProviderParametersRequest request);
