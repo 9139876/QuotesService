@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommonLibraries.Web" Version="1.0.6" />
+    <PackageReference Include="CommonLibraries.Web" Version="1.1.7" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,6 +26,24 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Update="C:\Users\Andrew\.nuget\packages\commonlibraries.web\1.0.6\contentFiles\any\net5.0\nlog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="C:\Users\Andrew\.nuget\packages\commonlibraries.web\1.0.7\contentFiles\any\net5.0\nlog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="C:\Users\Andrew\.nuget\packages\commonlibraries.web\1.0.8\contentFiles\any\net5.0\nlog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="C:\Users\Andrew\.nuget\packages\commonlibraries.web\1.0.9\contentFiles\any\net5.0\nlog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="C:\Users\Andrew\.nuget\packages\commonlibraries.web\1.1.5\contentFiles\any\net5.0\nlog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="C:\Users\Andrew\.nuget\packages\commonlibraries.web\1.1.6\contentFiles\any\net5.0\nlog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="C:\Users\Andrew\.nuget\packages\commonlibraries.web\1.1.7\contentFiles\any\net5.0\nlog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

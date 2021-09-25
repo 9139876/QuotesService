@@ -15,6 +15,12 @@ namespace QuotesService.WebApi
 {
     public class Startup : CommonLibraryStartup
     {
+        protected override bool _loadFromConfigService => true;
+
+        protected override bool _reloadAppSettingsOnChange => true;
+
+        protected override bool _requiredConfigService => true;
+
         public Startup() : base()
         { }
 

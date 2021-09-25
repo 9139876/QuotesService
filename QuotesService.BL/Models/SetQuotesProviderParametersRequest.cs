@@ -11,6 +11,6 @@ namespace QuotesService.BL.Models
 
         public string MarketName { get; set; }
 
-        public List<KeyValuePair<string, string>> Parameters = new List<KeyValuePair<string, string>>();
+        public List<KeyValuePair<string, string>> Parameters = new();
     }
 }

@@ -8,6 +8,6 @@ namespace QuotesService.BL.Models
 
         public QuotesProvider CurrentQuotesProvider { get; set; }
 
-        public List<QuotesProvider> AllQuotesProviders { get; set; } = new List<QuotesProvider>();
+        public List<QuotesProvider> AllQuotesProviders { get; set; } = new ();
     }
 }

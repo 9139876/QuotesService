@@ -6,7 +6,7 @@ namespace QuotesService.BL.Models
 {
     public class QuotesToStorageRequest
     {
-        public List<QuoteModel> Quotes { get; set; } = new List<QuoteModel>();
+        public List<QuoteModel> Quotes { get; set; } = new();
 
         public int TickerTfId { get; set; }
 

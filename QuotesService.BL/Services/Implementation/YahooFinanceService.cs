@@ -18,7 +18,7 @@ namespace QuotesService.BL.Services.Implementation
 {
     internal class YahooFinanceService : IYahooFinanceService
     {
-        private static readonly DateTime _zeroDt = new DateTime(1970, 1, 1);
+        private static readonly DateTime _zeroDt = new(1970, 1, 1);
         private readonly ITickersRepository _tickersRepository;
         private readonly IQuotesProvidersRepository _quotesProvidersRepository;
         private readonly ITickerTFsRepository _tickerTFsRepository;
@@ -44,7 +44,7 @@ namespace QuotesService.BL.Services.Implementation
         }
 
         public async Task<GetQuotesResponse> GetLastBatchQuotes(TickerMarketTimeFrame request)
-        {            
+        {
             var lastQuote = await _quotesRepository.GetLastQuote(request);
 
             var getQuotesRequest = new GetQuotesWithQPRequest()
@@ -59,17 +59,16 @@ namespace QuotesService.BL.Services.Implementation
             }
             else
             {
-                getQuotesRequest.StartDate = await Auxiliary.SearchFirstDate(request, this.GetQuotes);
+                getQuotesRequest.StartDate = new DateTime(1900, 1, 1);
             }
 
-            getQuotesRequest.EndDate = Auxiliary.GetEndBatchDate(getQuotesRequest.StartDate, request.TimeFrame);
+            getQuotesRequest.EndDate = Auxiliary.GetPossibleEndDate(request.TimeFrame);
 
             var getQuotesResponse = await GetQuotes(getQuotesRequest);
 
             var result = new GetQuotesResponse() { Quotes = Auxiliary.CorrectQuotes(new QuotesCorrectRequest() { TimeFrame = request.TimeFrame, Quotes = getQuotesResponse }) };
 
             return result;
-            ;
         }
 
         public async Task<StandartResponse> CheckGetQuotes(CheckGetQuotesRequest request)
@@ -214,7 +213,6 @@ namespace QuotesService.BL.Services.Implementation
             using (var reader = new System.IO.StreamReader(new WebClient().OpenRead(url) ?? throw new InvalidOperationException($"Не удалось получить данные по адресу '{url}'")))
             {
                 data = await reader.ReadToEndAsync();
-
             }
             var response = ParseQuotes(data);
             return response;

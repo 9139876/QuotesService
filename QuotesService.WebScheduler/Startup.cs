@@ -3,19 +3,19 @@ using CommonLibraries.Core.Extensions;
 using CommonLibraries.Web;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using QuotesService.DAL;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace QuotesService.WebScheduler
 {
     public class Startup : CommonLibraryStartup
     {
+        protected override bool _loadFromConfigService => true;
+
+        protected override bool _reloadAppSettingsOnChange => true;
+
+        protected override bool _requiredConfigService => false;
+
         public Startup() : base()
         { }
 

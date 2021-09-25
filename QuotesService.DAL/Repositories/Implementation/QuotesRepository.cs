@@ -48,5 +48,19 @@ namespace QuotesService.DAL.Repositories.Implementation
 
             return await query.ToListAsync();
         }
+
+        public async Task<List<QuoteEntity>> GetAllQuotes(TickerMarketTimeFrame request)
+        {
+            var query = from q in _dbcontext.Quotes
+                             join ttf in _dbcontext.TickerTFs on q.ParentTickerTFId equals ttf.Id
+                             join t in _dbcontext.Tickers on ttf.TickerId equals t.Id
+                             join m in _dbcontext.Markets on t.MarketId equals m.Id
+                             where m.Name == request.MarketName
+                                && t.Name == request.TickerName
+                                && ttf.TimeFrame == request.TimeFrame
+                             select q;
+
+            return await query.ToListAsync();
+        }
     }
 }

@@ -11,5 +11,7 @@ namespace QuotesService.DAL.Repositories
         Task<List<QuoteEntity>> GetQuotes(GetQuotesRequest request);
 
         Task<QuoteEntity> GetLastQuote(TickerMarketTimeFrame request);
+
+        Task<List<QuoteEntity>> GetAllQuotes(TickerMarketTimeFrame request);
     }
 }

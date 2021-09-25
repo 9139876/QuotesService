@@ -1,12 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using CommonLibraries.Web;
 using CommonLibraries.Core.Extensions;
 using QuotesService.DAL;
@@ -15,6 +9,12 @@ namespace QuotesService.WebApp
 {
     public class Startup : CommonLibraryStartup
     {
+        protected override bool _loadFromConfigService => true;
+
+        protected override bool _reloadAppSettingsOnChange => true;
+
+        protected override bool _requiredConfigService => true;
+
         protected override void ConfigureApplication(IApplicationBuilder app, IWebHostEnvironment env)
         {
             ConfigureWebAppStaticFiles(app, env);
@@ -24,6 +24,7 @@ namespace QuotesService.WebApp
         {
             services.RegisterDbContexts(Configuration);
 
+            services.RegisterAssemblyServiceAndRepositoryByMember<BL.PlaceboRegistration>();
             services.RegisterAssemblyServiceAndRepositoryByMember<DAL.PlaceboRegistration>();
             services.RegisterAssemblyServiceAndRepositoryByMember<Startup>();
         }

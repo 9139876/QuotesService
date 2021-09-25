@@ -7,6 +7,6 @@ namespace QuotesService.BL.Models
     {
         public QuotesProviderEnum QuotesProviderType { get; set; }
 
-        public List<KeyValuePair<string, string>> Parameters { get; set; } = new List<KeyValuePair<string, string>>();
+        public List<KeyValuePair<string, string>> Parameters { get; set; } = new ();
     }
 }
