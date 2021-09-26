@@ -7,7 +7,7 @@ namespace QuotesService.Api.Services
 {
     public interface IGetQuotesRemoteCallService
     {
-        Task<QuotesInfoResponse> GetQuotesInfo(TickerMarketTimeFrame request);
+        Task<QuotesInfo> GetQuotesInfo(TickerMarketTimeFrame request);
 
         Task<List<QuoteModel>> GetQuotes(GetQuotesRequest request);
     }

@@ -19,7 +19,7 @@ namespace QuotesService.Api.Services.Implementation
         public async Task<List<QuoteModel>> GetQuotes(GetQuotesRequest request)
             => await ExecutePostAsync<List<QuoteModel>, GetQuotesRequest>("api/get-quotes", request);
 
-        public async Task<QuotesInfoResponse> GetQuotesInfo(TickerMarketTimeFrame request)
-            => await ExecutePostAsync<QuotesInfoResponse, TickerMarketTimeFrame>("api/get-quotes-info", request);
+        public async Task<QuotesInfo> GetQuotesInfo(TickerMarketTimeFrame request)
+            => await ExecutePostAsync<QuotesInfo, TickerMarketTimeFrame>("api/get-quotes-info", request);
     }
 }

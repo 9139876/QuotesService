@@ -7,14 +7,8 @@ namespace QuotesService.Api.Models.RequestResponse
     {
         public TickerMarketTimeFrame TickerMarketTimeFrame { get; set; }
 
-        public DateTime StartDate { get; set; }
+        public DateTime? StartDate { get; set; }
 
-        public DateTime EndDate
-        {
-            get => _endDate ?? DateTime.Now;
-            set => _endDate = value;
-        }
-
-        private DateTime? _endDate;
+        public DateTime? EndDate { get; set; }
     }
 }

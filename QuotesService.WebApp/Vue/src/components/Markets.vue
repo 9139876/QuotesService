@@ -95,15 +95,20 @@
                     <button class="nav-link" data-bs-toggle="tab" type="button" v-on:click="currentTab = 'quotesProviderTasks'">
                         Задачи получения котировок
                     </button>
+                </li>                
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" type="button" v-on:click="currentTab = 'quotesInfo'">
+                        Информация о котировках
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" type="button" v-on:click="currentTab = 'quotesComparator'">
+                        Сравнение котировок
+                    </button>
                 </li>
                 <li class="nav-item">
                     <button class="nav-link" data-bs-toggle="tab" type="button" v-on:click="currentTab = 'loadFromFile'">
                         Загрузка котировок из файла
-                    </button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link" data-bs-toggle="tab" type="button" v-on:click="currentTab = 'quotesInfo'">
-                        Информация о котировках
                     </button>
                 </li>
             </ul>
@@ -115,7 +120,11 @@
 
                 <!-- Quotes provider -->
                 <div v-if="currentTab === 'quotesProvider'">
-                    <QuotesProvider :currentMarketNameIP="currentMarketName" :currentTickerNameIP="currentTickerName"></QuotesProvider>
+                    <QuotesProvider
+                        :currentMarketNameIP="currentMarketName"
+                        :currentTickerNameIP="currentTickerName"
+                        @ticker-renamed="onReanamedTicker"
+                    ></QuotesProvider>
                 </div>
 
                 <!-- Quotes provider tasks -->
@@ -123,14 +132,19 @@
                     <QuotesProviderTasks :currentMarketNameIP="currentMarketName" :currentTickerNameIP="currentTickerName"></QuotesProviderTasks>
                 </div>
 
+                <!-- Информация о котировках -->
+                <div v-if="currentTab === 'quotesInfo'">
+                    <QuotesInfo :currentMarketNameIP="currentMarketName" :currentTickerNameIP="currentTickerName"></QuotesInfo>
+                </div>
+
+                <!-- Сравнение котировок -->
+                <div v-if="currentTab === 'quotesComparator'">
+                    Сравнение котировок
+                </div>
+
                 <!-- Загрузка котировок из файла -->
                 <div v-if="currentTab === 'loadFromFile'">
                     Загрузка котировок из файла
-                </div>
-
-                <!-- Информация о котировках -->
-                <div v-if="currentTab === 'quotesInfo'">
-                    Информация о котировках
                 </div>
             </div>
         </template>
@@ -143,6 +157,7 @@ import axios from "axios";
 import TickerInfo from "./TickerInfo.vue";
 import QuotesProvider from "./QuotesProvider.vue";
 import QuotesProviderTasks from "./QuotesProviderTasks.vue";
+import QuotesInfo from "./QuotesInfo.vue";
 import ModalAddMarket from "./ModalAddMarket.vue";
 import ModalDeleteMarket from "./ModalDeleteMarket.vue";
 import ModalAddTicker from "./ModalAddTicker.vue";
@@ -154,6 +169,7 @@ export default {
         TickerInfo,
         QuotesProvider,
         QuotesProviderTasks,
+        QuotesInfo,
         ModalAddMarket,
         ModalDeleteMarket,
         ModalAddTicker,
@@ -165,7 +181,7 @@ export default {
             markets: [],
             currentMarketName: "",
             currentTickerName: "",
-            currentTab: "",            
+            currentTab: "",
             modalAddMarketVisible: false,
             modalDeleteMarketVisible: false,
             modalAddTickerVisible: false,
@@ -222,9 +238,14 @@ export default {
             this.currentTickerName = "";
             this.modalDeleteTickerVisible = false;
         },
+        onReanamedTicker: function(newName) {
+            this.getMarkets();
+            this.currentTickerName = newName;
+        },
     },
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped></style>
+<style scoped>
+</style>

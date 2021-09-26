@@ -70,48 +70,48 @@ namespace QuotesService.BL.Static
         /// <param name="quotesProvider">Поставщик котировок</param>
         /// <param name="yearsAgo">На сколько лет назад смотреть</param>
         /// <returns></returns>
-        public async static Task<DateTime> SearchFirstDate(TickerMarketTimeFrame tickerMarketTimeFrame, Func<GetQuotesRequest, Task<List<QuoteModel>>> getQuotesDelegate, int yearsAgo = 30)
-        {
-            var end = DateTime.Now;
-            var start = end.AddYears(-yearsAgo);
+        //public async static Task<DateTime> SearchFirstDate(TickerMarketTimeFrame tickerMarketTimeFrame, Func<GetQuotesRequest, Task<List<QuoteModel>>> getQuotesDelegate, int yearsAgo = 30)
+        //{
+        //    var end = DateTime.Now;
+        //    var start = end.AddYears(-yearsAgo);
 
-            var getQuotesRequest = new GetQuotesRequest()
-            {
-                TickerMarketTimeFrame = tickerMarketTimeFrame
-            };
+        //    var getQuotesRequest = new GetQuotesRequest()
+        //    {
+        //        TickerMarketTimeFrame = tickerMarketTimeFrame
+        //    };
 
-            while ((end - start).TotalDays >= 1)
-            {
-                var median = GetMedian(start, end);
-                getQuotesRequest.StartDate = median;
-                getQuotesRequest.EndDate = GetEndBatchDate(getQuotesRequest.StartDate, getQuotesRequest.TickerMarketTimeFrame.TimeFrame);
+        //    while ((end - start).TotalDays >= 1)
+        //    {
+        //        var median = GetMedian(start, end);
+        //        getQuotesRequest.StartDate = median;
+        //        getQuotesRequest.EndDate = GetEndBatchDate(getQuotesRequest.StartDate, getQuotesRequest.TickerMarketTimeFrame.TimeFrame);
 
-                var quotes = await getQuotesDelegate(getQuotesRequest);// quotesProvider.GetQuotes(getQuotesRequest);
-                quotes.RequiredNotNull(nameof(quotes), getQuotesRequest);
+        //        var quotes = await getQuotesDelegate(getQuotesRequest);// quotesProvider.GetQuotes(getQuotesRequest);
+        //        quotes.RequiredNotNull(nameof(quotes), getQuotesRequest);
 
-                if (quotes.Any())
-                {
-                    var quotesMinDate = quotes.Min(x => x.Date);
+        //        if (quotes.Any())
+        //        {
+        //            var quotesMinDate = quotes.Min(x => x.Date);
 
-                    //Если дата первой полученной котировки существенно меньше запрошенной даты - считаем, что это и есть первая имеющаяся котировка
-                    if (IsEssentialDifferentDates(quotesMinDate, median, getQuotesRequest.TickerMarketTimeFrame.TimeFrame))
-                    {
-                        return quotesMinDate;
-                    }
+        //            //Если дата первой полученной котировки существенно меньше запрошенной даты - считаем, что это и есть первая имеющаяся котировка
+        //            if (IsEssentialDifferentDates(quotesMinDate, median, getQuotesRequest.TickerMarketTimeFrame.TimeFrame))
+        //            {
+        //                return quotesMinDate;
+        //            }
 
-                    end = median;
-                }
-                else
-                {
-                    start = median;
-                }
+        //            end = median;
+        //        }
+        //        else
+        //        {
+        //            start = median;
+        //        }
 
-                //Не DDOS`им поставщика котировок!!!
-                Thread.Sleep(5000);
-            }
+        //        //Не DDOS`им поставщика котировок!!!
+        //        Thread.Sleep(5000);
+        //    }
 
-            return start;
-        }
+        //    return start;
+        //}
 
         /// <summary>
         /// Приводит котировки к единому формату по времени

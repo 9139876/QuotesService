@@ -9,17 +9,17 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace QuotesService.BL.Services.Implementation
 {
-    internal class YahooFinanceService : AbstractQuotesProvider<YahooFinanceGetDataInfoModel>, IYahooFinanceService
+    internal class StooqService : AbstractQuotesProvider<StooqGetDataInfoModel>, IStooqService
     {
-        private static readonly DateTime _zeroDt = new(1970, 1, 1);
         private readonly IQuotesRepository _quotesRepository;
 
-        public YahooFinanceService(
+        protected override QuotesProviderEnum QuotesProviderType => QuotesProviderEnum.Stooq;
+
+        public StooqService(
             ITickersRepository tickersRepository,
             IQuotesProvidersRepository quotesProvidersRepository,
             ITickerTFsRepository tickerTFsRepository,
@@ -35,15 +35,15 @@ namespace QuotesService.BL.Services.Implementation
             _quotesRepository = quotesRepository;
         }
 
-        protected override QuotesProviderEnum QuotesProviderType => QuotesProviderEnum.YahooFinance;
-
         public override List<TimeFrameEnum> GetAvailableTimeFrames()
         {
             return new List<TimeFrameEnum>
             {
                 TimeFrameEnum.D1,
                 TimeFrameEnum.W1,
-                TimeFrameEnum.M1
+                TimeFrameEnum.M1,
+                TimeFrameEnum.Seasonly,
+                TimeFrameEnum.Y1
             };
         }
 
@@ -60,13 +60,13 @@ namespace QuotesService.BL.Services.Implementation
             if (lastQuote != null)
             {
                 getQuotesRequest.StartDate = lastQuote.Date;
+                getQuotesRequest.EndDate = Auxiliary.GetPossibleEndDate(request.TimeFrame);
             }
             else
             {
-                getQuotesRequest.StartDate = new DateTime(1900, 1, 1);
+                getQuotesRequest.StartDate = null;
+                getQuotesRequest.EndDate = null;
             }
-
-            getQuotesRequest.EndDate = Auxiliary.GetPossibleEndDate(request.TimeFrame);
 
             var getQuotesResponse = await GetQuotes(getQuotesRequest);
 
@@ -75,27 +75,34 @@ namespace QuotesService.BL.Services.Implementation
             return result;
         }
 
-        protected override YahooFinanceGetDataInfoModel CreateGetDataInfoModel(List<KeyValuePair<string, string>> parameters)
+        protected override StooqGetDataInfoModel CreateGetDataInfoModel(List<KeyValuePair<string, string>> parameters)
         {
-            if (parameters.Where(x => x.Key == nameof(YahooFinanceGetDataInfoModel.Symbol)).Any() == false)
+            if (parameters.Where(x => x.Key == nameof(StooqGetDataInfoModel.Symbol)).Any() == false)
             {
-                throw new InvalidOperationException($"Пропущен обязательный параметр - {nameof(YahooFinanceGetDataInfoModel.Symbol)}");
+                throw new InvalidOperationException($"Пропущен обязательный параметр - {nameof(StooqGetDataInfoModel.Symbol)}");
             }
 
-            return new YahooFinanceGetDataInfoModel()
+            return new StooqGetDataInfoModel()
             {
                 Symbol = parameters.Single(x => x.Key == nameof(YahooFinanceGetDataInfoModel.Symbol)).Value
             };
         }
 
-        protected override string GetQuotesURL(YahooFinanceGetDataInfoModel getDataInfo, DateTime? start, DateTime? end, TimeFrameEnum timeFrame)
-        {
+        protected override string GetQuotesURL(StooqGetDataInfoModel getDataInfo, DateTime? start, DateTime? end, TimeFrameEnum timeFrame)
+        {            
             if (string.IsNullOrEmpty(getDataInfo?.Symbol))
             {
                 throw new ArgumentException($"Value {nameof(getDataInfo.Symbol)} is null or empty");
             }
 
-            if (start == null)
+            var tfCode = GetTimeFrameCode(timeFrame);
+
+            if (start == null && end == null)
+            {
+                return $"https://stooq.com/q/d/l/?s={getDataInfo.Symbol}&i={tfCode}";
+            }
+
+            if(start == null)
             {
                 throw new ArgumentException($"Date {nameof(start)} is null");
             }
@@ -105,34 +112,34 @@ namespace QuotesService.BL.Services.Implementation
                 throw new ArgumentException($"Date {nameof(end)} is null");
             }
 
-            start = new DateTime(start.Value.Year, start.Value.Month, start.Value.Day, 0, 0, 0);
-            end = new DateTime(end.Value.Year, end.Value.Month, end.Value.Day, 23, 59, 59);
+            var d1 = start.Value.ToString("yyyyMMdd");
+            var d2 = end.Value.ToString("yyyyMMdd");
 
-            return $"https://query1.finance.yahoo.com/v7/finance/download/{getDataInfo.Symbol}?period1={GetDateValue(start.Value)}&period2={GetDateValue(end.Value)}&interval={GetTimeFrameCode(timeFrame)}&events=history&includeAdjustedClose=true";
+            return $"https://stooq.com/q/d/l/?s={getDataInfo.Symbol}&d1={d1}&d2={d2}&i={tfCode}";
+            //https://stooq.com/q/d/l/?s=aapl.us&d1=20000907&d2=20210924&i=d
+
         }
 
         private static string GetTimeFrameCode(TimeFrameEnum timeFrame)
         {
             switch (timeFrame)
             {
-                case TimeFrameEnum.D1: return "1d";
-                case TimeFrameEnum.W1: return "1wk";
-                case TimeFrameEnum.M1: return "1mo";
+                case TimeFrameEnum.D1: return "d";
+                case TimeFrameEnum.W1: return "w";
+                case TimeFrameEnum.M1: return "m";
+                case TimeFrameEnum.Seasonly: return "q";
+                case TimeFrameEnum.Y1: return "y";
 
                 default:
-                    throw new ArgumentOutOfRangeException($"Неподходящий таймфрейм для YahooFinance - {timeFrame.ToString()}");
+                    throw new ArgumentOutOfRangeException($"Неподходящий таймфрейм для Stooq - {timeFrame.ToString()}");
             }
-        }
-        private static long GetDateValue(DateTime dt)
-        {
-            return (long)((dt - _zeroDt).TotalSeconds);
         }
 
         protected override List<QuoteModel> ParseQuotes(string data)
         {
             var result = new List<QuoteModel>();
 
-            foreach (var row in data.Split('\n', StringSplitOptions.RemoveEmptyEntries).Skip(1))
+            foreach (var row in data.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries).Skip(1))
             {
                 var values = row.Split(',');
 
@@ -143,7 +150,7 @@ namespace QuotesService.BL.Services.Implementation
                     Hi = decimal.Parse(values[2], NumberStyles.Any, CultureInfo.InvariantCulture),
                     Low = decimal.Parse(values[3], NumberStyles.Any, CultureInfo.InvariantCulture),
                     Close = decimal.Parse(values[4], NumberStyles.Any, CultureInfo.InvariantCulture),
-                    Volume = decimal.Parse(values[6], NumberStyles.Any, CultureInfo.InvariantCulture),
+                    Volume = decimal.Parse(values[5], NumberStyles.Any, CultureInfo.InvariantCulture),
                 });
             }
 

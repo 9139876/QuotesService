@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommonLibraries.Web" Version="1.1.7" />
+    <PackageReference Include="CommonLibraries.Web" Version="1.1.9" />
   </ItemGroup>
 
   <ItemGroup>
@@ -44,6 +44,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Update="C:\Users\Andrew\.nuget\packages\commonlibraries.web\1.1.7\contentFiles\any\net5.0\nlog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="C:\Users\Andrew\.nuget\packages\commonlibraries.web\1.1.9\contentFiles\any\net5.0\nlog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

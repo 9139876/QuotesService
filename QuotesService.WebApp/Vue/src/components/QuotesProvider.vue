@@ -71,6 +71,7 @@ export default {
         currentMarketNameIP: String,
         currentTickerNameIP: String,
     },
+    emits:["ticker-renamed"],
     data: function() {
         return {
             checkGetQuotesUrl: "/quotes-getter-api/check-get-quotes",
@@ -182,9 +183,8 @@ export default {
                     if (response.data?.isSuccess === true) {
                         alert("Параметры успешно сохранены!");
 
-                        //Обновление информации
-                        this.getQuotesProvider();
-                        //this.getTickerInfo();
+                        //Обновление информации                        
+                        this.$emit("ticker-renamed", response.data.message);
                     } else {
                         alert(response.data?.message ?? "Неизвестная ошибка сервера");
                     }

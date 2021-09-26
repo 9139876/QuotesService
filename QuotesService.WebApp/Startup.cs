@@ -24,6 +24,7 @@ namespace QuotesService.WebApp
         {
             services.RegisterDbContexts(Configuration);
 
+            services.RegisterAssemblyServiceAndRepositoryByMember<Api.PlaceboRegistration>();
             services.RegisterAssemblyServiceAndRepositoryByMember<BL.PlaceboRegistration>();
             services.RegisterAssemblyServiceAndRepositoryByMember<DAL.PlaceboRegistration>();
             services.RegisterAssemblyServiceAndRepositoryByMember<Startup>();

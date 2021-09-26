@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using QuotesService.Api.Enum;
 using QuotesService.Api.Models;
 using QuotesService.Api.Models.RequestResponse;
+using QuotesService.Api.Services;
 using QuotesService.BL.Models;
 using QuotesService.BL.Services;
 using QuotesService.DAL.Entities;
@@ -28,6 +29,7 @@ namespace QuotesService.WebApp.Controllers.Api
         private readonly IQuotesProvidersRepository _quotesProvidersRepository;
         private readonly IQuotesDbContext _quotesDbContext;
         private readonly IStrategyService _strategyService;
+        private readonly IGetQuotesRemoteCallService _getQuotesRemoteCallService;
 
         public QuotesGetterApiController(
             IMarketsRepository marketsRepository,
@@ -37,7 +39,8 @@ namespace QuotesService.WebApp.Controllers.Api
             ITickerTFsRepository tickerTFsRepository,
             IQuotesProvidersRepository quotesProvidersRepository,
             IQuotesDbContext quotesDbContext,
-            IStrategyService strategyService)
+            IStrategyService strategyService,
+            IGetQuotesRemoteCallService getQuotesRemoteCallService)
         {
             _marketsRepository = marketsRepository;
             _tickersRepository = tickersRepository;
@@ -47,6 +50,7 @@ namespace QuotesService.WebApp.Controllers.Api
             _quotesProvidersRepository = quotesProvidersRepository;
             _quotesDbContext = quotesDbContext;
             _strategyService = strategyService;
+            _getQuotesRemoteCallService = getQuotesRemoteCallService;
         }
 
         [HttpGet("get-markets")]
@@ -57,12 +61,12 @@ namespace QuotesService.WebApp.Controllers.Api
 
             var dict = new Dictionary<int, MarketWithTickers>();
 
-            foreach (var market in markets)
+            foreach (var market in markets.OrderBy(x => x.Name))
             {
                 dict.Add(market.Id, new MarketWithTickers() { MarketName = market.Name });
             }
 
-            foreach (var ticker in tickers)
+            foreach (var ticker in tickers.OrderBy(x => x.Name))
             {
                 dict[ticker.MarketId].TickersNames.Add(ticker.Name);
             }
@@ -453,13 +457,13 @@ namespace QuotesService.WebApp.Controllers.Api
         {
             request.RequiredNotNull(nameof(request));
 
-            var check = await CheckGetQuotes(new CheckGetQuotesRequest() 
+            var check = await CheckGetQuotes(new CheckGetQuotesRequest()
             {
                 QuotesProviderType = request.QuotesProviderType,
                 Parameters = request.Parameters
             });
 
-            if(check.IsSuccess != true)
+            if (check.IsSuccess != true)
             {
                 return check;
             }
@@ -467,6 +471,31 @@ namespace QuotesService.WebApp.Controllers.Api
             var service = _strategyService.GetInstance(request.QuotesProviderType);
 
             return await service.SetQuotesProviderParameters(request);
+        }
+
+        [HttpPost("get-quotes-info")]
+        public async Task<List<QuotesInfo>> GetQuotesInfo([FromBody] TickerAndMarket request)
+        {
+            request.RequiredNotNull(nameof(request));
+
+            var result = new List<QuotesInfo>();
+
+            foreach (TimeFrameEnum tf in Enum.GetValues(typeof(TimeFrameEnum)))
+            {
+                var getQuotesInfoRequest = new TickerMarketTimeFrame()
+                {
+                    TimeFrame = tf,
+                    MarketName = request.MarketName,
+                    TickerName = request.TickerName
+                };
+
+                var quotesInfo = await _getQuotesRemoteCallService.GetQuotesInfo(getQuotesInfoRequest);
+                quotesInfo.RequiredNotNull(nameof(quotesInfo), getQuotesInfoRequest);
+
+                result.Add(quotesInfo);
+            }
+
+            return result;
         }
     }
 }
