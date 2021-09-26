@@ -32,4 +32,7 @@ input {
 .col-md-7 {
     margin: 1.5vmin 0 3vmin 0;
 }
+.container{
+    max-width: 1450px;
+}
 </style>
