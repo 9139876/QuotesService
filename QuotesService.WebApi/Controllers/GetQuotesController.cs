@@ -4,7 +4,6 @@ using QuotesService.Api.Models.RequestResponse;
 using QuotesService.DAL.Repositories;
 using System.Threading.Tasks;
 using System.Linq;
-using QuotesService.DAL.Entities;
 using System.Collections.Generic;
 using QuotesService.Api.Models;
 
