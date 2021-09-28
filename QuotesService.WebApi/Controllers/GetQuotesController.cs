@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using QuotesService.Api.Models;
 using System;
 using QuotesService.Api.Enum;
+using QuotesService.Api.Static;
 
 namespace QuotesService.WebApi.Controllers
 {
@@ -49,12 +50,12 @@ namespace QuotesService.WebApi.Controllers
             {
                 TimeFrameName = Description.GetDescription(request.TimeFrame),
                 QuotesCount = count,
-                FirstDate = GetDateString(firstDate, request.TimeFrame),
-                LastDate = GetDateString(lastDate, request.TimeFrame),
-                MinPriceDate = GetDateString(minPriceQuote.Date, request.TimeFrame),
-                MinPrice = GetDecimalString(minPriceQuote.Low),
-                MaxPriceDate = GetDateString(maxPriceQuote.Date, request.TimeFrame),
-                MaxPrice = GetDecimalString(maxPriceQuote.Hi)
+                FirstDate = Auxiliary.GetDateString(firstDate, request.TimeFrame),
+                LastDate = Auxiliary.GetDateString(lastDate, request.TimeFrame),
+                MinPriceDate = Auxiliary.GetDateString(minPriceQuote.Date, request.TimeFrame),
+                MinPrice = Auxiliary.GetDecimalString(minPriceQuote.Low),
+                MaxPriceDate = Auxiliary.GetDateString(maxPriceQuote.Date, request.TimeFrame),
+                MaxPrice = Auxiliary.GetDecimalString(maxPriceQuote.Hi)
             };
 
             return result;
@@ -80,38 +81,6 @@ namespace QuotesService.WebApi.Controllers
                     Volume = x.Volume ?? -1
                 })
                 .ToList();
-        }
-
-        private static string GetDecimalString(decimal d)
-        {
-            if (d < 1)
-            {
-                return d.ToString("f6");
-            }
-            else if (d < 10)
-            {
-                return d.ToString("f4");
-            }
-            else
-            {
-                return d.ToString("f2");
-            }
-        }
-
-        private static string GetDateString(DateTime dt, TimeFrameEnum tf)
-        {
-            if ((int)tf == 10)
-            {
-                return dt.ToString("G");
-            }
-            else if ((int)tf <= 40)
-            {
-                return dt.ToString("g");
-            }
-            else
-            {
-                return dt.ToString("d");
-            }
         }
     }
 }

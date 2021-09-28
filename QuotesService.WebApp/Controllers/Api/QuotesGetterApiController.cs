@@ -30,6 +30,7 @@ namespace QuotesService.WebApp.Controllers.Api
         private readonly IQuotesDbContext _quotesDbContext;
         private readonly IStrategyService _strategyService;
         private readonly IGetQuotesRemoteCallService _getQuotesRemoteCallService;
+        private readonly IQuotesStorageService _quotesStorageService;
 
         public QuotesGetterApiController(
             IMarketsRepository marketsRepository,
@@ -40,7 +41,8 @@ namespace QuotesService.WebApp.Controllers.Api
             IQuotesProvidersRepository quotesProvidersRepository,
             IQuotesDbContext quotesDbContext,
             IStrategyService strategyService,
-            IGetQuotesRemoteCallService getQuotesRemoteCallService)
+            IGetQuotesRemoteCallService getQuotesRemoteCallService,
+            IQuotesStorageService quotesStorageService)
         {
             _marketsRepository = marketsRepository;
             _tickersRepository = tickersRepository;
@@ -51,6 +53,7 @@ namespace QuotesService.WebApp.Controllers.Api
             _quotesDbContext = quotesDbContext;
             _strategyService = strategyService;
             _getQuotesRemoteCallService = getQuotesRemoteCallService;
+            _quotesStorageService = quotesStorageService;
         }
 
         [HttpGet("get-markets")]
@@ -496,6 +499,14 @@ namespace QuotesService.WebApp.Controllers.Api
             }
 
             return result;
+        }
+
+        [HttpPost("compare-quotes")]
+        public async Task<CompareQuotesResponse> CompareQuotes([FromBody] CompareQuotesRequest request)
+        {
+            request.RequiredNotNull(nameof(request));
+
+            return await _quotesStorageService.CompareQuotes(request);
         }
     }
 }

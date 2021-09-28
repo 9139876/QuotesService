@@ -1,4 +1,6 @@
-﻿namespace QuotesService.Api.Models
+﻿using QuotesService.Api.Enum;
+
+namespace QuotesService.Api.Models
 {
     public class TickerAndMarket
     {
