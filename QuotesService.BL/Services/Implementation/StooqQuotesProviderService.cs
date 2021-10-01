@@ -13,21 +13,19 @@ using System.Threading.Tasks;
 
 namespace QuotesService.BL.Services.Implementation
 {
-    internal class StooqService : AbstractQuotesProvider<StooqGetDataInfoModel>, IStooqService
+    internal class StooqQuotesProviderService : AbstractQuotesProvider<StooqGetDataInfoModel>, IStooqQuotesProviderService
     {
         private readonly IQuotesRepository _quotesRepository;
 
-        protected override QuotesProviderEnum QuotesProviderType => QuotesProviderEnum.Stooq;
+        protected override QuotesProviderTypeEnum QuotesProviderType => QuotesProviderTypeEnum.Stooq;
 
-        public StooqService(
+        public StooqQuotesProviderService(
             ITickersRepository tickersRepository,
-            IQuotesProvidersRepository quotesProvidersRepository,
             ITickerTFsRepository tickerTFsRepository,
             IQuotesProvidersTasksRepository quotesProvidersTasksRepository,
             IQuotesDbContext quotesDbContext,
             IQuotesRepository quotesRepository) : base(
                 tickersRepository,
-                quotesProvidersRepository,
                 tickerTFsRepository,
                 quotesProvidersTasksRepository,
                 quotesDbContext)
@@ -60,7 +58,7 @@ namespace QuotesService.BL.Services.Implementation
             if (lastQuote != null)
             {
                 getQuotesRequest.StartDate = lastQuote.Date;
-                getQuotesRequest.EndDate = Auxiliary.GetPossibleEndDate(request.TimeFrame);
+                getQuotesRequest.EndDate = AuxiliaryBL.GetPossibleEndDate(request.TimeFrame);
             }
             else
             {
@@ -70,7 +68,7 @@ namespace QuotesService.BL.Services.Implementation
 
             var getQuotesResponse = await GetQuotes(getQuotesRequest);
 
-            var result = new GetQuotesResponse() { Quotes = Auxiliary.CorrectQuotes(new QuotesCorrectRequest() { TimeFrame = request.TimeFrame, Quotes = getQuotesResponse }) };
+            var result = new GetQuotesResponse() { Quotes = AuxiliaryBL.CorrectQuotes(new QuotesCorrectRequest() { TimeFrame = request.TimeFrame, Quotes = getQuotesResponse }) };
 
             return result;
         }
@@ -84,17 +82,12 @@ namespace QuotesService.BL.Services.Implementation
 
             return new StooqGetDataInfoModel()
             {
-                Symbol = parameters.Single(x => x.Key == nameof(YahooFinanceGetDataInfoModel.Symbol)).Value
+                Symbol = parameters.Single(x => x.Key == nameof(StooqGetDataInfoModel.Symbol)).Value
             };
         }
 
         protected override string GetQuotesURL(StooqGetDataInfoModel getDataInfo, DateTime? start, DateTime? end, TimeFrameEnum timeFrame)
-        {            
-            if (string.IsNullOrEmpty(getDataInfo?.Symbol))
-            {
-                throw new ArgumentException($"Value {nameof(getDataInfo.Symbol)} is null or empty");
-            }
-
+        {
             var tfCode = GetTimeFrameCode(timeFrame);
 
             if (start == null && end == null)
@@ -102,14 +95,14 @@ namespace QuotesService.BL.Services.Implementation
                 return $"https://stooq.com/q/d/l/?s={getDataInfo.Symbol}&i={tfCode}";
             }
 
-            if(start == null)
+            if (start == null)
             {
-                throw new ArgumentException($"Date {nameof(start)} is null");
+                throw new ArgumentException($"Date {nameof(start)} is null, but {nameof(end)} is not null");
             }
 
             if (end == null)
             {
-                throw new ArgumentException($"Date {nameof(end)} is null");
+                throw new ArgumentException($"Date {nameof(end)} is null, but {nameof(start)} is not null");
             }
 
             var d1 = start.Value.ToString("yyyyMMdd");

@@ -8,7 +8,7 @@
                 <div class="modal-body">
                     <h6>Вы уверены, что хотите удалить рынок {{ currentMarketName }}?</h6>
                     <div v-if="currentMarketTickers.length > 0">Будут также удалены следующие инструменты:</div>
-                    <div v-for="item in currentMarketTickers" :key="item">- {{ item }}</div>
+                    <div v-for="(item, index) in currentMarketTickers" :key="index">- {{ item }}</div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" v-on:click="deleteMarket()">Удалить</button>

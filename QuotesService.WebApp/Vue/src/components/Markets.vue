@@ -5,7 +5,7 @@
             <div class="col-md-7">
                 <select class="form-select form-select-md" v-model="currentMarketName">
                     <option disabled value="">Выбор рынка</option>
-                    <option v-for="item in markets.map((x) => x.marketName)" :key="item">
+                    <option v-for="(item, index) in markets.map((x) => x.marketName)" :key="index">
                         {{ item }}
                     </option>
                 </select>
@@ -42,7 +42,7 @@
                 <div class="col-md-7">
                     <select class="form-select form-select-md" v-model="currentTickerName">
                         <option disabled value="">Выбор инструмента</option>
-                        <option v-for="item in currentMarketTickers" :key="item">
+                        <option v-for="(item, index) in currentMarketTickers" :key="index">
                             {{ item }}
                         </option>
                     </select>

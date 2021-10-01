@@ -5,6 +5,6 @@ namespace QuotesService.BL.Models
 {
     public class GetQuotesWithQPRequest : GetQuotesRequest
     {
-        public QuotesProviderEnum QuotesProvider { get; set; }
+        public QuotesProviderTypeEnum QuotesProvider { get; set; }
     }
 }

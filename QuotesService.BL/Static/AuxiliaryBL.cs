@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace QuotesService.BL.Static
 {
-    internal static class Auxiliary
+    internal static class AuxiliaryBL
     {
         /// <summary>
         /// Возвращает конечную дату для партии котировок для получения у поставщика котировок
@@ -229,6 +229,26 @@ namespace QuotesService.BL.Static
             }
 
             return new DateTime(year, month, day, hour, min, sec);
+        }
+
+        public static int GetDifferenceBetweenDates(DateTime dt1, DateTime dt2, TimeFrameEnum tf)
+        {
+            var diff = new DateTime(Math.Max(dt1.Ticks, dt2.Ticks)) - new DateTime(Math.Min(dt1.Ticks, dt2.Ticks));
+
+            switch (tf)
+            {
+                case TimeFrameEnum.tick: return (int)diff.TotalSeconds;
+                case TimeFrameEnum.min1: return (int)diff.TotalMinutes;
+                case TimeFrameEnum.min4: return (int)(diff.TotalMinutes / 4);
+                case TimeFrameEnum.H1: return (int)diff.TotalHours;
+                case TimeFrameEnum.D1: return (int)diff.TotalDays;
+                case TimeFrameEnum.W1: return (int)(diff.TotalDays / 7);
+                case TimeFrameEnum.M1: return (int)(diff.TotalDays / 30);
+                case TimeFrameEnum.Seasonly: return (int)(diff.TotalDays / 120);
+                case TimeFrameEnum.Y1: return (int)(diff.TotalDays / 365.25);
+
+                default: throw new NotSupportedException($"Not supported timeframe '{tf}'");
+            }
         }
     }
 }

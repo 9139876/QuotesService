@@ -7,7 +7,7 @@
                 <input type="text" class="form-control" readonly="true" v-model="currentQuotesProvider.assignedName" />
                 <div class="border">
                     <h4>Параметры</h4>
-                    <div v-for="(item, index) in currentQuotesProvider?.parameters" :key="item.value">
+                    <div v-for="(item, index) in currentQuotesProvider?.parameters" :key="index">
                         <label v-bind:for="'quotesProviderProperty' + index" class="form-label">
                             <strong>{{ item.key }}</strong>
                         </label>
@@ -24,7 +24,7 @@
                 <div class="col-md-8">
                     <select class="form-select form-select-lg" v-model="currentQuotesProvider.assignedName">
                         <option disabled value="">Выбор поставщика котировок</option>
-                        <option v-for="item in currentQuotesProvider?.allQuotesProviders?.map((x) => x.quotesProviderName)" :key="item">
+                        <option v-for="(item, index) in currentQuotesProvider?.allQuotesProviders?.map((x) => x.quotesProviderName)" :key="index">
                             {{ item }}
                         </option>
                     </select>
@@ -37,7 +37,7 @@
                 </div>
             </form>
 
-            <div v-for="(item, index) in currentQuotesProvider?.parameters" :key="item.value">
+            <div v-for="(item, index) in currentQuotesProvider?.parameters" :key="index">
                 <label v-bind:for="'quotesProviderProperty' + index" class="form-label">
                     <strong>{{ item.key }}</strong>
                 </label>

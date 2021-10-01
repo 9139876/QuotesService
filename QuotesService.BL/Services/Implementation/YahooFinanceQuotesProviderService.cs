@@ -14,20 +14,18 @@ using System.Threading.Tasks;
 
 namespace QuotesService.BL.Services.Implementation
 {
-    internal class YahooFinanceService : AbstractQuotesProvider<YahooFinanceGetDataInfoModel>, IYahooFinanceService
+    internal class YahooFinanceQuotesProviderService : AbstractQuotesProvider<YahooFinanceGetDataInfoModel>, IYahooFinanceQuotesProviderService
     {
         private static readonly DateTime _zeroDt = new(1970, 1, 1);
         private readonly IQuotesRepository _quotesRepository;
 
-        public YahooFinanceService(
+        public YahooFinanceQuotesProviderService(
             ITickersRepository tickersRepository,
-            IQuotesProvidersRepository quotesProvidersRepository,
             ITickerTFsRepository tickerTFsRepository,
             IQuotesProvidersTasksRepository quotesProvidersTasksRepository,
             IQuotesDbContext quotesDbContext,
             IQuotesRepository quotesRepository) : base(
                 tickersRepository,
-                quotesProvidersRepository,
                 tickerTFsRepository,
                 quotesProvidersTasksRepository,
                 quotesDbContext)
@@ -35,7 +33,7 @@ namespace QuotesService.BL.Services.Implementation
             _quotesRepository = quotesRepository;
         }
 
-        protected override QuotesProviderEnum QuotesProviderType => QuotesProviderEnum.YahooFinance;
+        protected override QuotesProviderTypeEnum QuotesProviderType => QuotesProviderTypeEnum.YahooFinance;
 
         public override List<TimeFrameEnum> GetAvailableTimeFrames()
         {
@@ -66,11 +64,11 @@ namespace QuotesService.BL.Services.Implementation
                 getQuotesRequest.StartDate = new DateTime(1900, 1, 1);
             }
 
-            getQuotesRequest.EndDate = Auxiliary.GetPossibleEndDate(request.TimeFrame);
+            getQuotesRequest.EndDate = AuxiliaryBL.GetPossibleEndDate(request.TimeFrame);
 
             var getQuotesResponse = await GetQuotes(getQuotesRequest);
 
-            var result = new GetQuotesResponse() { Quotes = Auxiliary.CorrectQuotes(new QuotesCorrectRequest() { TimeFrame = request.TimeFrame, Quotes = getQuotesResponse }) };
+            var result = new GetQuotesResponse() { Quotes = AuxiliaryBL.CorrectQuotes(new QuotesCorrectRequest() { TimeFrame = request.TimeFrame, Quotes = getQuotesResponse }) };
 
             return result;
         }
@@ -90,11 +88,6 @@ namespace QuotesService.BL.Services.Implementation
 
         protected override string GetQuotesURL(YahooFinanceGetDataInfoModel getDataInfo, DateTime? start, DateTime? end, TimeFrameEnum timeFrame)
         {
-            if (string.IsNullOrEmpty(getDataInfo?.Symbol))
-            {
-                throw new ArgumentException($"Value {nameof(getDataInfo.Symbol)} is null or empty");
-            }
-
             if (start == null)
             {
                 throw new ArgumentException($"Date {nameof(start)} is null");

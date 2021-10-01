@@ -17,26 +17,23 @@ namespace QuotesService.BL.Services.Implementation
     internal abstract class AbstractQuotesProvider<TGetDataInfoModel> : IQuotesProvider where TGetDataInfoModel : class, new()
     {
         protected readonly ITickersRepository _tickersRepository;
-        protected readonly IQuotesProvidersRepository _quotesProvidersRepository;
         protected readonly ITickerTFsRepository _tickerTFsRepository;
         protected readonly IQuotesProvidersTasksRepository _quotesProvidersTasksRepository;
         protected readonly IQuotesDbContext _quotesDbContext;
 
         protected AbstractQuotesProvider(
             ITickersRepository tickersRepository,
-            IQuotesProvidersRepository quotesProvidersRepository,
             ITickerTFsRepository tickerTFsRepository,
             IQuotesProvidersTasksRepository quotesProvidersTasksRepository,
             IQuotesDbContext quotesDbContext)
         {
             _tickersRepository = tickersRepository;
-            _quotesProvidersRepository = quotesProvidersRepository;
             _tickerTFsRepository = tickerTFsRepository;
             _quotesProvidersTasksRepository = quotesProvidersTasksRepository;
             _quotesDbContext = quotesDbContext;
         }
 
-        protected abstract QuotesProviderEnum QuotesProviderType { get; }
+        protected abstract QuotesProviderTypeEnum QuotesProviderType { get; }
 
         public abstract Task<GetQuotesResponse> GetLastBatchQuotes(TickerMarketTimeFrame request);
 
@@ -93,16 +90,13 @@ namespace QuotesService.BL.Services.Implementation
             {
                 var ticker = await GetTicker(request.TickerName, request.MarketName);
 
-                if (ticker.QuotesProviderId != null)
+                if (ticker.QuotesProviderType != null)
                 {
                     throw new InvalidOperationException($"Для инструмента {request.TickerName} рынок {request.MarketName} уже установлены параметры поставщика котировок, изменять их нельзя, нужно создать новый инструмент");
                 }
 
-                var quotesProvider = await _quotesProvidersRepository.GetQuotesProviderByType(request.QuotesProviderType);
-                quotesProvider.RequiredNotNull(nameof(quotesProvider), request.QuotesProviderType);
-
-                ticker.QuotesProviderId = quotesProvider.Id;
-                ticker.ProviderGetDataInfo = request.Parameters.ToModel<TGetDataInfoModel>().Serialize();
+                ticker.QuotesProviderType = request.QuotesProviderType;
+                ticker.ProviderGetDataInfo = CreateGetDataInfoModel(request.Parameters).Serialize();
                 ticker.Name = $"{ticker.Name} ({QuotesProviderType.ToString()})";
 
                 var tasks = new List<QuotesProviderTaskEntity>();
@@ -132,7 +126,7 @@ namespace QuotesService.BL.Services.Implementation
                     transaction.Commit();
                 }
 
-                return new StandartResponse() { IsSuccess = true , Message= ticker.Name };
+                return new StandartResponse() { IsSuccess = true, Message = ticker.Name };
             }
             catch (Exception ex)
             {
@@ -168,7 +162,7 @@ namespace QuotesService.BL.Services.Implementation
             return await GetQuotes(url);
         }
 
-        protected async Task<List<QuoteModel>> GetQuotes(string url)
+        protected virtual async Task<List<QuoteModel>> GetQuotes(string url)
         {
             var data = string.Empty;
 

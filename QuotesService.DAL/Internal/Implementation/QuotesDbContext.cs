@@ -12,7 +12,6 @@ namespace QuotesService.DAL.Internal.Implementation
 
         public DbSet<MarketEntity> Markets { get; set; }
         public DbSet<QuoteEntity> Quotes { get; set; }
-        public DbSet<QuotesProviderEntity> QuotesProviders { get; set; }
         public DbSet<TickerEntity> Tickers { get; set; }
         public DbSet<TickerInfoEntity> TickersInfoes { get; set; }
         public DbSet<TickerInfoNameEntity> TickersInfoesNames { get; set; }

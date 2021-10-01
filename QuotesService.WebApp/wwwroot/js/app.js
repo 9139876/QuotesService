@@ -1232,9 +1232,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }, [_hoisted_4, (Object(vue__WEBPACK_IMPORTED_MODULE_1__["openBlock"])(true), Object(vue__WEBPACK_IMPORTED_MODULE_1__["createElementBlock"])(vue__WEBPACK_IMPORTED_MODULE_1__["Fragment"], null, Object(vue__WEBPACK_IMPORTED_MODULE_1__["renderList"])(_ctx.markets.map(function (x) {
     return x.marketName;
-  }), function (item) {
+  }), function (item, index) {
     return Object(vue__WEBPACK_IMPORTED_MODULE_1__["openBlock"])(), Object(vue__WEBPACK_IMPORTED_MODULE_1__["createElementBlock"])("option", {
-      key: item
+      key: index
     }, Object(vue__WEBPACK_IMPORTED_MODULE_1__["toDisplayString"])(item), 1
     /* TEXT */
     );
@@ -1279,9 +1279,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) {
       return _ctx.currentTickerName = $event;
     })
-  }, [_hoisted_10, (Object(vue__WEBPACK_IMPORTED_MODULE_1__["openBlock"])(true), Object(vue__WEBPACK_IMPORTED_MODULE_1__["createElementBlock"])(vue__WEBPACK_IMPORTED_MODULE_1__["Fragment"], null, Object(vue__WEBPACK_IMPORTED_MODULE_1__["renderList"])($options.currentMarketTickers, function (item) {
+  }, [_hoisted_10, (Object(vue__WEBPACK_IMPORTED_MODULE_1__["openBlock"])(true), Object(vue__WEBPACK_IMPORTED_MODULE_1__["createElementBlock"])(vue__WEBPACK_IMPORTED_MODULE_1__["Fragment"], null, Object(vue__WEBPACK_IMPORTED_MODULE_1__["renderList"])($options.currentMarketTickers, function (item, index) {
     return Object(vue__WEBPACK_IMPORTED_MODULE_1__["openBlock"])(), Object(vue__WEBPACK_IMPORTED_MODULE_1__["createElementBlock"])("option", {
-      key: item
+      key: index
     }, Object(vue__WEBPACK_IMPORTED_MODULE_1__["toDisplayString"])(item), 1
     /* TEXT */
     );
@@ -1596,9 +1596,9 @@ Object(vue__WEBPACK_IMPORTED_MODULE_0__["popScopeId"])();
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   return Object(vue__WEBPACK_IMPORTED_MODULE_0__["openBlock"])(), Object(vue__WEBPACK_IMPORTED_MODULE_0__["createElementBlock"])("div", _hoisted_1, [Object(vue__WEBPACK_IMPORTED_MODULE_0__["createElementVNode"])("div", _hoisted_2, [Object(vue__WEBPACK_IMPORTED_MODULE_0__["createElementVNode"])("div", _hoisted_3, [_hoisted_4, Object(vue__WEBPACK_IMPORTED_MODULE_0__["createElementVNode"])("div", _hoisted_5, [Object(vue__WEBPACK_IMPORTED_MODULE_0__["createElementVNode"])("h6", null, "Вы уверены, что хотите удалить рынок " + Object(vue__WEBPACK_IMPORTED_MODULE_0__["toDisplayString"])(_ctx.currentMarketName) + "?", 1
   /* TEXT */
-  ), _ctx.currentMarketTickers.length > 0 ? (Object(vue__WEBPACK_IMPORTED_MODULE_0__["openBlock"])(), Object(vue__WEBPACK_IMPORTED_MODULE_0__["createElementBlock"])("div", _hoisted_6, "Будут также удалены следующие инструменты:")) : Object(vue__WEBPACK_IMPORTED_MODULE_0__["createCommentVNode"])("v-if", true), (Object(vue__WEBPACK_IMPORTED_MODULE_0__["openBlock"])(true), Object(vue__WEBPACK_IMPORTED_MODULE_0__["createElementBlock"])(vue__WEBPACK_IMPORTED_MODULE_0__["Fragment"], null, Object(vue__WEBPACK_IMPORTED_MODULE_0__["renderList"])(_ctx.currentMarketTickers, function (item) {
+  ), _ctx.currentMarketTickers.length > 0 ? (Object(vue__WEBPACK_IMPORTED_MODULE_0__["openBlock"])(), Object(vue__WEBPACK_IMPORTED_MODULE_0__["createElementBlock"])("div", _hoisted_6, "Будут также удалены следующие инструменты:")) : Object(vue__WEBPACK_IMPORTED_MODULE_0__["createCommentVNode"])("v-if", true), (Object(vue__WEBPACK_IMPORTED_MODULE_0__["openBlock"])(true), Object(vue__WEBPACK_IMPORTED_MODULE_0__["createElementBlock"])(vue__WEBPACK_IMPORTED_MODULE_0__["Fragment"], null, Object(vue__WEBPACK_IMPORTED_MODULE_0__["renderList"])(_ctx.currentMarketTickers, function (item, index) {
     return Object(vue__WEBPACK_IMPORTED_MODULE_0__["openBlock"])(), Object(vue__WEBPACK_IMPORTED_MODULE_0__["createElementBlock"])("div", {
-      key: item
+      key: index
     }, "- " + Object(vue__WEBPACK_IMPORTED_MODULE_0__["toDisplayString"])(item), 1
     /* TEXT */
     );
@@ -1858,7 +1858,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* NEED_PATCH */
   ), [[vue__WEBPACK_IMPORTED_MODULE_1__["vModelText"], _ctx.currentQuotesProvider.assignedName]]), Object(vue__WEBPACK_IMPORTED_MODULE_1__["createElementVNode"])("div", _hoisted_5, [_hoisted_6, (Object(vue__WEBPACK_IMPORTED_MODULE_1__["openBlock"])(true), Object(vue__WEBPACK_IMPORTED_MODULE_1__["createElementBlock"])(vue__WEBPACK_IMPORTED_MODULE_1__["Fragment"], null, Object(vue__WEBPACK_IMPORTED_MODULE_1__["renderList"])((_ctx$currentQuotesPro2 = _ctx.currentQuotesProvider) === null || _ctx$currentQuotesPro2 === void 0 ? void 0 : _ctx$currentQuotesPro2.parameters, function (item, index) {
     return Object(vue__WEBPACK_IMPORTED_MODULE_1__["openBlock"])(), Object(vue__WEBPACK_IMPORTED_MODULE_1__["createElementBlock"])("div", {
-      key: item.value
+      key: index
     }, [Object(vue__WEBPACK_IMPORTED_MODULE_1__["createElementVNode"])("label", {
       for: 'quotesProviderProperty' + index,
       class: "form-label"
@@ -1886,9 +1886,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }, [_hoisted_14, (Object(vue__WEBPACK_IMPORTED_MODULE_1__["openBlock"])(true), Object(vue__WEBPACK_IMPORTED_MODULE_1__["createElementBlock"])(vue__WEBPACK_IMPORTED_MODULE_1__["Fragment"], null, Object(vue__WEBPACK_IMPORTED_MODULE_1__["renderList"])((_ctx$currentQuotesPro3 = _ctx.currentQuotesProvider) === null || _ctx$currentQuotesPro3 === void 0 ? void 0 : (_ctx$currentQuotesPro4 = _ctx$currentQuotesPro3.allQuotesProviders) === null || _ctx$currentQuotesPro4 === void 0 ? void 0 : _ctx$currentQuotesPro4.map(function (x) {
     return x.quotesProviderName;
-  }), function (item) {
+  }), function (item, index) {
     return Object(vue__WEBPACK_IMPORTED_MODULE_1__["openBlock"])(), Object(vue__WEBPACK_IMPORTED_MODULE_1__["createElementBlock"])("option", {
-      key: item
+      key: index
     }, Object(vue__WEBPACK_IMPORTED_MODULE_1__["toDisplayString"])(item), 1
     /* TEXT */
     );
@@ -1904,7 +1904,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }, " Получить параметры ")])]), (Object(vue__WEBPACK_IMPORTED_MODULE_1__["openBlock"])(true), Object(vue__WEBPACK_IMPORTED_MODULE_1__["createElementBlock"])(vue__WEBPACK_IMPORTED_MODULE_1__["Fragment"], null, Object(vue__WEBPACK_IMPORTED_MODULE_1__["renderList"])((_ctx$currentQuotesPro5 = _ctx.currentQuotesProvider) === null || _ctx$currentQuotesPro5 === void 0 ? void 0 : _ctx$currentQuotesPro5.parameters, function (item, index) {
     return Object(vue__WEBPACK_IMPORTED_MODULE_1__["openBlock"])(), Object(vue__WEBPACK_IMPORTED_MODULE_1__["createElementBlock"])("div", {
-      key: item.value
+      key: index
     }, [Object(vue__WEBPACK_IMPORTED_MODULE_1__["createElementVNode"])("label", {
       for: 'quotesProviderProperty' + index,
       class: "form-label"

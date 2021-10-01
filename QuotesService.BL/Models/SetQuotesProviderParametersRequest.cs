@@ -5,7 +5,7 @@ namespace QuotesService.BL.Models
 {
     public class SetQuotesProviderParametersRequest
     {
-        public QuotesProviderEnum QuotesProviderType { get; set; }
+        public QuotesProviderTypeEnum QuotesProviderType { get; set; }
 
         public string TickerName { get; set; }
 

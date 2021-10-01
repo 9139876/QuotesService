@@ -12,8 +12,6 @@ namespace QuotesService.DAL.Internal
 
         DbSet<QuoteEntity> Quotes { get; set; }
 
-        DbSet<QuotesProviderEntity> QuotesProviders { get; set; }
-
         DbSet<TickerEntity> Tickers { get; set; }
 
         DbSet<TickerInfoEntity> TickersInfoes { get; set; }

@@ -23,7 +23,7 @@ namespace QuotesService.DAL.Repositories
 
         Task<List<QuotesProviderTaskEntity>> GetAllActiveTasksWithoutFirstDate();
 
-        Task<QuotesProviderEnum> GetQuotesProviderType(int quotesProviderTaskId);
+        Task<QuotesProviderTypeEnum> GetQuotesProviderType(int quotesProviderTaskId);
 
         Task<TimeFrameEnum> GetQuotesProviderTimeFrame(int quotesProviderTaskId);
 

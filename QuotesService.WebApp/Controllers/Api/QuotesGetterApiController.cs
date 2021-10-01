@@ -26,7 +26,6 @@ namespace QuotesService.WebApp.Controllers.Api
         private readonly ITickersInfoesRepository _tickersInfoesRepository;
         private readonly ITickersInfoesNamesRepository _tickersInfoesNamesRepository;
         private readonly ITickerTFsRepository _tickerTFsRepository;
-        private readonly IQuotesProvidersRepository _quotesProvidersRepository;
         private readonly IQuotesDbContext _quotesDbContext;
         private readonly IStrategyService _strategyService;
         private readonly IGetQuotesRemoteCallService _getQuotesRemoteCallService;
@@ -38,7 +37,6 @@ namespace QuotesService.WebApp.Controllers.Api
             ITickersInfoesRepository tickersInfoesRepository,
             ITickersInfoesNamesRepository tickersInfoesNamesRepository,
             ITickerTFsRepository tickerTFsRepository,
-            IQuotesProvidersRepository quotesProvidersRepository,
             IQuotesDbContext quotesDbContext,
             IStrategyService strategyService,
             IGetQuotesRemoteCallService getQuotesRemoteCallService,
@@ -49,7 +47,6 @@ namespace QuotesService.WebApp.Controllers.Api
             _tickersInfoesRepository = tickersInfoesRepository;
             _tickersInfoesNamesRepository = tickersInfoesNamesRepository;
             _tickerTFsRepository = tickerTFsRepository;
-            _quotesProvidersRepository = quotesProvidersRepository;
             _quotesDbContext = quotesDbContext;
             _strategyService = strategyService;
             _getQuotesRemoteCallService = getQuotesRemoteCallService;
@@ -294,9 +291,9 @@ namespace QuotesService.WebApp.Controllers.Api
 
             string quotesProviderName = null;
 
-            if (existingTicker.QuotesProviderId > 0)
+            if (existingTicker.QuotesProviderType != null)
             {
-                quotesProviderName = (await _quotesProvidersRepository.GetQuotesProviderById(existingTicker.QuotesProviderId.Value))?.Name;
+                quotesProviderName = existingTicker.QuotesProviderType.ToString();
             }
 
             result.Properties.Add(new TickerInfoProperty()
@@ -417,28 +414,23 @@ namespace QuotesService.WebApp.Controllers.Api
                 throw new InvalidOperationException($"Ticker {request.TickerName} in market {request.MarketName} not exsit");
             }
 
-            var allQuotesProviders = await _quotesProvidersRepository.GetAllQuotesProviders();
-
             var result = new GetQuotesProviderResponse()
             {
-                AllQuotesProviders = allQuotesProviders.Select(x => new QuotesProvider()
+                AllQuotesProviders = Enum.GetValues<QuotesProviderTypeEnum>().Select(x => new QuotesProvider()
                 {
-                    QuotesProviderName = x.Name,
-                    QuotesProviderType = x.QuotesProviderType
+                    QuotesProviderName = x.ToString(),
+                    QuotesProviderType = x
                 }).ToList()
             };
 
-            if (existingTicker.QuotesProviderId > 0)
+            if (existingTicker.QuotesProviderType != null)
             {
-                var currentQuotesProvider = await _quotesProvidersRepository.GetQuotesProviderById(existingTicker.QuotesProviderId.Value);
-                currentQuotesProvider.RequiredNotNull(nameof(currentQuotesProvider), existingTicker.QuotesProviderId);
-
                 result.QuotesProviderAssigned = true;
 
                 result.CurrentQuotesProvider = new QuotesProvider()
                 {
-                    QuotesProviderName = currentQuotesProvider.Name,
-                    QuotesProviderType = currentQuotesProvider.QuotesProviderType
+                    QuotesProviderName = existingTicker.QuotesProviderType.ToString(),
+                    QuotesProviderType = existingTicker.QuotesProviderType.Value
                 };
             }
 

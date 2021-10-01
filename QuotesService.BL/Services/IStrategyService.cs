@@ -9,6 +9,6 @@ namespace QuotesService.BL.Services
 {
     public interface IStrategyService
     {
-        IQuotesProvider GetInstance(QuotesProviderEnum type);
+        IQuotesProvider GetInstance(QuotesProviderTypeEnum type);
     }
 }

@@ -2,8 +2,11 @@
 
 namespace QuotesService.BL.Models
 {
-    public class StooqGetDataInfoModel
+    public class NasdaqGetDataInfoModel
     {
+        [Required]
+        public string Class { get; set; }
+
         [Required]
         public string Symbol { get; set; }
     }

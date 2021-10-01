@@ -5,26 +5,32 @@ namespace QuotesService.BL.Services.Implementation
 {
     internal class StrategyService : IStrategyService
     {
-        private readonly IYahooFinanceService _yahooFinanceService;
-        private readonly IStooqService _stooqService;
+        private readonly IYahooFinanceQuotesProviderService _yahooFinanceService;
+        private readonly IStooqQuotesProviderService _stooqService;
+        private readonly INasdaqQuotesProviderService _nasdaqQuotesProviderService;
+        private readonly IAlphaVantageQuotesProviderService _alphaVantageQuotesProviderService;
 
         public StrategyService(
-            IYahooFinanceService yahooFinanceService,
-            IStooqService stooqService)
+            IYahooFinanceQuotesProviderService yahooFinanceService,
+            IStooqQuotesProviderService stooqService,
+            INasdaqQuotesProviderService nasdaqQuotesProviderService,
+            IAlphaVantageQuotesProviderService alphaVantageQuotesProviderService)
         {
             _yahooFinanceService = yahooFinanceService;
             _stooqService = stooqService;
+            _nasdaqQuotesProviderService = nasdaqQuotesProviderService;
+            _alphaVantageQuotesProviderService = alphaVantageQuotesProviderService;
         }
 
-        public IQuotesProvider GetInstance(QuotesProviderEnum type)
+        public IQuotesProvider GetInstance(QuotesProviderTypeEnum type)
         {
             return type switch
             {
-                QuotesProviderEnum.YahooFinance => _yahooFinanceService,
-                QuotesProviderEnum.AlphaVantage => throw new NotImplementedException(),
-                QuotesProviderEnum.Finam => throw new NotImplementedException(),
-                QuotesProviderEnum.Finnhub => throw new NotImplementedException(),
-                QuotesProviderEnum.Stooq => _stooqService,
+                QuotesProviderTypeEnum.YahooFinance => _yahooFinanceService,
+                QuotesProviderTypeEnum.AlphaVantage => _alphaVantageQuotesProviderService,
+                QuotesProviderTypeEnum.Finam => throw new NotImplementedException(),
+                QuotesProviderTypeEnum.Nasdaq => _nasdaqQuotesProviderService,
+                QuotesProviderTypeEnum.Stooq => _stooqService,
 
                 _ => throw new NotSupportedException($"Неизвестный тип поставщика котировок - {type.ToString()}"),
             };

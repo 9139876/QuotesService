@@ -200,7 +200,7 @@ namespace QuotesService.BL.Services.Implementation
                 transaction.Commit();
             }
 
-            return QuotesService.BL.Static.Auxiliary.IsReallyLastQuote(request.Quotes.Max(x => x.Date), request.TickerMarketTimeFrame.TimeFrame);
+            return QuotesService.BL.Static.AuxiliaryBL.IsReallyLastQuote(request.Quotes.Max(x => x.Date), request.TickerMarketTimeFrame.TimeFrame);
         }
     }
 }

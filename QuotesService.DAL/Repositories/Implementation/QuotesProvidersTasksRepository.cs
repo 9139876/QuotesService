@@ -80,18 +80,22 @@ namespace QuotesService.DAL.Repositories.Implementation
             return queryResult;
         }
 
-        public async Task<QuotesProviderEnum> GetQuotesProviderType(int quotesProviderTaskId)
+        public async Task<QuotesProviderTypeEnum> GetQuotesProviderType(int quotesProviderTaskId)
         {
             var query = from qpt in _dbcontext.QuotesProvidersTasks
                         join ttf in _dbcontext.TickerTFs on qpt.TickerTFId equals ttf.Id
                         join t in _dbcontext.Tickers on ttf.TickerId equals t.Id
-                        join qp in _dbcontext.QuotesProviders on t.QuotesProviderId equals qp.Id
                         where qpt.Id == quotesProviderTaskId
-                        select qp.QuotesProviderType;
+                        select t.QuotesProviderType;
 
-            var queryResult = await query.SingleAsync();
+            var queryResult = (await query.SingleAsync()).ToString();
 
-            return queryResult;
+            if(!Enum.TryParse(queryResult, out QuotesProviderTypeEnum result))
+            {
+                throw new InvalidCastException($"QuotesProviderType by number value = {queryResult}");
+            }
+
+            return result;
         }
 
         public async Task<QuotesProviderTaskEntity> GetTaskById(int id)

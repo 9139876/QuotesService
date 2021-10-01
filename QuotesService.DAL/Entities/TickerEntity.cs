@@ -12,7 +12,7 @@ namespace QuotesService.DAL.Entities
 
         public int MarketId { get; set; }
 
-        public int? QuotesProviderId { get; set; }
+        public QuotesProviderTypeEnum? QuotesProviderType { get; set; }
 
         public string ProviderGetDataInfo { get; set; }
 

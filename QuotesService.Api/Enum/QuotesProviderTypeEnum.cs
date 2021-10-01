@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace QuotesService.Api.Enum
 {
-    public enum QuotesProviderEnum
+    public enum QuotesProviderTypeEnum
     {
         YahooFinance = 1,
         Stooq = 2,
         Finam = 3,
         AlphaVantage = 4,
-        Finnhub = 5
+        Nasdaq = 5
     }
 }
