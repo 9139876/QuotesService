@@ -26,7 +26,7 @@ export default {
     name: "ModalDeleteMarket",
     props: {
         currentMarketNameIP: String,
-        currentMarketTickersIP: [],
+        currentMarketTickersIP: Array,
     },
     emits: ["close-command", "submit-close-command"],
     data: function() {

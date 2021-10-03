@@ -139,7 +139,7 @@
 
                 <!-- Сравнение котировок -->
                 <div v-if="currentTab === 'quotesComparator'">
-                    Сравнение котировок
+                    <QuotesComparator :currentMarketNameIP="currentMarketName" :currentTickerNameIP="currentTickerName" :marketsIP="markets"></QuotesComparator>
                 </div>
 
                 <!-- Загрузка котировок из файла -->
@@ -162,6 +162,7 @@ import ModalAddMarket from "./ModalAddMarket.vue";
 import ModalDeleteMarket from "./ModalDeleteMarket.vue";
 import ModalAddTicker from "./ModalAddTicker.vue";
 import ModalDeleteTicker from "./ModalDeleteTicker.vue";
+import QuotesComparator from "./QuotesComparator.vue";
 
 export default {
     name: "Markets",
@@ -170,10 +171,11 @@ export default {
         QuotesProvider,
         QuotesProviderTasks,
         QuotesInfo,
+        QuotesComparator,
         ModalAddMarket,
         ModalDeleteMarket,
         ModalAddTicker,
-        ModalDeleteTicker,
+        ModalDeleteTicker        
     },
     data: function() {
         return {

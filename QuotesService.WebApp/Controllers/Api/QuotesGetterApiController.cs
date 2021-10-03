@@ -493,6 +493,29 @@ namespace QuotesService.WebApp.Controllers.Api
             return result;
         }
 
+        [HttpPost("get-quotes-info-by-tf")]
+        public async Task<QuotesInfo> GetQuotesInfoByTf([FromBody] TickerMarketTimeFrame request)
+        {
+            request.RequiredNotNull(nameof(request));
+
+            var result = await _getQuotesRemoteCallService.GetQuotesInfo(request);
+            result.RequiredNotNull(nameof(result), request);
+
+            return result;
+        }
+
+        [HttpGet("get-timeframes")]
+        public List<TimeFramesModel> GetTimeFrames()
+        {
+            return Enum.GetValues<TimeFrameEnum>()
+                .Select(x => new TimeFramesModel()
+                {
+                    Type = x.ToString(),
+                    Name = Description.GetDescription(x)
+                })
+                .ToList();
+        }
+
         [HttpPost("compare-quotes")]
         public async Task<CompareQuotesResponse> CompareQuotes([FromBody] CompareQuotesRequest request)
         {
