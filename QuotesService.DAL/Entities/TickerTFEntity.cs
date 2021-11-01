@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using CommonLibraries.Graal.Enums;
 using QuotesService.Api.Enum;
 
 namespace QuotesService.DAL.Entities

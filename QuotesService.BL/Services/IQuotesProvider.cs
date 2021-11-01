@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using QuotesService.Api.Enum;
+using CommonLibraries.Graal.Enums;
 using QuotesService.Api.Models.RequestResponse;
 using QuotesService.BL.Models;
 

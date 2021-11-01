@@ -14,6 +14,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System.Globalization;
 using System.Net;
+using CommonLibraries.Graal.Enums;
+using CommonLibraries.Graal.Models;
 
 namespace QuotesService.BL.Services.Implementation
 {

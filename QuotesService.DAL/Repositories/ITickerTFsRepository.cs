@@ -1,5 +1,5 @@
 ﻿using CommonLibraries.EF;
-using QuotesService.Api.Enum;
+using CommonLibraries.Graal.Enums;
 using QuotesService.DAL.Entities;
 using System.Threading.Tasks;
 

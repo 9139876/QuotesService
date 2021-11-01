@@ -9,6 +9,7 @@ using QuotesService.Api.Models;
 using System;
 using QuotesService.Api.Enum;
 using QuotesService.Api.Static;
+using CommonLibraries.Graal.Models;
 
 namespace QuotesService.WebApi.Controllers
 {

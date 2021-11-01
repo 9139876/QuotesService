@@ -1,5 +1,5 @@
 {
-  "name": "quotesservice",
+  "name": "QuotesService",
   "version": "0.1.0",
   "private": true,
   "scripts": {

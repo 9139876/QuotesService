@@ -1,4 +1,5 @@
 ﻿using CommonLibraries.EF.Implementation;
+using CommonLibraries.Graal.Enums;
 using Microsoft.EntityFrameworkCore;
 using QuotesService.Api.Enum;
 using QuotesService.Api.Models;
@@ -7,7 +8,6 @@ using QuotesService.DAL.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace QuotesService.DAL.Repositories.Implementation

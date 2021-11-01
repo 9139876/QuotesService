@@ -1,4 +1,5 @@
-﻿using CommonLibraries.RemoteCall;
+﻿using CommonLibraries.Graal.Models;
+using CommonLibraries.RemoteCall;
 using CommonLibraries.RemoteCall.Services;
 using Microsoft.Extensions.Configuration;
 using QuotesService.Api.Models;

@@ -1,4 +1,4 @@
-﻿using QuotesService.Api.Enum;
+﻿using CommonLibraries.Graal.Enums;
 using QuotesService.Api.Models;
 
 namespace QuotesService.BL.Models
@@ -10,8 +10,6 @@ namespace QuotesService.BL.Models
         public TickerAndMarket TickerAndMarketSecond { get; set; }
 
         public TimeFrameEnum TimeFrame { get; set; }
-
-        //public bool CheckSkips { get; set; }
 
         public int MaxDifferencePercent { get; set; }
     }

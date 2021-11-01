@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using CommonLibraries.Graal.Models;
+using System.Collections.Generic;
 
 namespace QuotesService.Api.Models.RequestResponse
 {

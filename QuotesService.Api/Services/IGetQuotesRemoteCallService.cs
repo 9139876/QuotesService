@@ -1,4 +1,5 @@
-﻿using QuotesService.Api.Models;
+﻿using CommonLibraries.Graal.Models;
+using QuotesService.Api.Models;
 using QuotesService.Api.Models.RequestResponse;
 using System.Collections.Generic;
 using System.Threading.Tasks;

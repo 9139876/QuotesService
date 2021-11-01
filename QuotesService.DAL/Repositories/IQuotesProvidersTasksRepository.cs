@@ -1,12 +1,9 @@
 ﻿using CommonLibraries.EF;
+using CommonLibraries.Graal.Enums;
 using QuotesService.Api.Enum;
 using QuotesService.Api.Models;
-using QuotesService.Api.Models.RequestResponse;
 using QuotesService.DAL.Entities;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace QuotesService.DAL.Repositories
