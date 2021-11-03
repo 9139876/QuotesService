@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <Version>1.0.1</Version>
+    <Version>1.0.3</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="CommonLibraries.Core" Version="1.0.4" />
-    <PackageReference Include="CommonLibraries.Graal" Version="1.0.1" />
+    <PackageReference Include="CommonLibraries.Graal" Version="1.0.2" />
     <PackageReference Include="CommonLibraries.RemoteCall" Version="1.0.6" />
   </ItemGroup>
 

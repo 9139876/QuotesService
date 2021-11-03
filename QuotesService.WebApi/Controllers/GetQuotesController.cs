@@ -18,11 +18,14 @@ namespace QuotesService.WebApi.Controllers
     public class GetQuotesController
     {
         private readonly IQuotesRepository _quotesRepository;
+        private readonly ITickersRepository _tickersRepository;
 
         public GetQuotesController(
-            IQuotesRepository quotesRepository)
+            IQuotesRepository quotesRepository,
+            ITickersRepository tickersRepository)
         {
             _quotesRepository = quotesRepository;
+            _tickersRepository = tickersRepository;
         }
 
         [HttpPost]
@@ -72,16 +75,34 @@ namespace QuotesService.WebApi.Controllers
             quotes.RequiredNotNull(nameof(quotes), request);
 
             return quotes
-                .Select(x => new QuoteModel()
-                {
-                    Date = x.Date,
-                    Open = x.Open ?? (x.Hi + x.Low) / 2,
-                    Hi = x.Hi,
-                    Low = x.Low,
-                    Close = x.Close ?? (x.Hi + x.Low) / 2,
-                    Volume = x.Volume ?? -1
-                })
+                .Select(x => x.GetQuoteModel())
                 .ToList();
+        }
+
+        [HttpPost]
+        [Route("get-nearest-quote")]
+        public async Task<GetNearestQuoteResponse> GetNearestQuote([FromBody] GetNearestQuoteRequest request)
+        {
+            request.RequiredNotNull(nameof(request));
+
+            var quote = (await _quotesRepository.GetNearestQuote(request))?.GetQuoteModel();
+
+            return new GetNearestQuoteResponse()
+            {
+                IsSuccess = quote != null,
+                Quote = quote
+            };
+        }
+
+        [HttpPost]
+        [Route("get-all-tickers-and-markets")]
+        public async Task<List<TickerAndMarket>> GetAllTickersAndMarkets([FromBody] GetAllTickersAndMarketsRequest request)
+        {
+            request.RequiredNotNull(nameof(request));
+
+            var result = await _tickersRepository.GetAllTickersAndMarkets(request);
+
+            return result;
         }
     }
 }

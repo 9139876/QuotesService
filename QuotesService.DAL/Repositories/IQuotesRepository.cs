@@ -13,5 +13,7 @@ namespace QuotesService.DAL.Repositories
         Task<QuoteEntity> GetLastQuote(TickerMarketTimeFrame request);
 
         Task<List<QuoteEntity>> GetAllQuotes(TickerMarketTimeFrame request);
+
+        Task<QuoteEntity> GetNearestQuote(GetNearestQuoteRequest request);
     }
 }

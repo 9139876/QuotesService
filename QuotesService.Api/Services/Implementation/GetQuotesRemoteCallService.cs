@@ -17,6 +17,12 @@ namespace QuotesService.Api.Services.Implementation
 
         protected override string _apiSchemeAndHostConfigKey { get; set; } = "QuotesService.Api.SchemeAndHost";
 
+        public async Task<List<TickerAndMarket>> GetAllTickersAndMarkets(GetAllTickersAndMarketsRequest request)
+            => await ExecutePostAsync<List<TickerAndMarket>, GetAllTickersAndMarketsRequest>("api/get-all-tickers-and-markets", request);
+
+        public async Task<GetNearestQuoteResponse> GetNearestQuote(GetNearestQuoteRequest request)
+            => await ExecutePostAsync<GetNearestQuoteResponse, GetNearestQuoteRequest>("api/get-nearest-quote", request);
+
         public async Task<List<QuoteModel>> GetQuotes(GetQuotesRequest request)
             => await ExecutePostAsync<List<QuoteModel>, GetQuotesRequest>("api/get-quotes", request);
 

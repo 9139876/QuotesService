@@ -12,5 +12,7 @@ namespace QuotesService.DAL.Repositories
         Task<TickerEntity> GetByTickerAndMarket(TickerAndMarket request);
 
         Task<List<TickerEntity>> GetAllTickers();
+
+        Task<List<TickerAndMarket>> GetAllTickersAndMarkets(GetAllTickersAndMarketsRequest request);
     }
 }

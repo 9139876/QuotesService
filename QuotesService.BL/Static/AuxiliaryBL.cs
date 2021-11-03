@@ -1,5 +1,6 @@
 ﻿using CommonLibraries.Core.Extensions;
 using CommonLibraries.Graal.Enums;
+using CommonLibraries.Graal.Extensions;
 using CommonLibraries.Graal.Models;
 using QuotesService.Api.Enum;
 using QuotesService.Api.Models;
@@ -24,7 +25,7 @@ namespace QuotesService.BL.Static
         /// <returns></returns>
         public static DateTime GetEndBatchDate(DateTime startDate, TimeFrameEnum timeFrame)
         {
-            var possibleEndDate = GetPossibleEndDate(timeFrame);
+            var possibleEndDate = DateTimeExtensions.GetPossibleEndDate(timeFrame, DateTime.Now);
 
             switch (timeFrame)
             {
@@ -36,30 +37,6 @@ namespace QuotesService.BL.Static
                 case TimeFrameEnum.W1: return new DateTime(Math.Min(startDate.AddYears(3).Ticks, possibleEndDate.Ticks));
                 case TimeFrameEnum.M1: return new DateTime(Math.Min(startDate.AddYears(10).Ticks, possibleEndDate.Ticks));
                 case TimeFrameEnum.Y1: return new DateTime(Math.Min(startDate.AddYears(30).Ticks, possibleEndDate.Ticks));
-
-                default: throw new InvalidOperationException($"Неизвестный таймфрейм - '{timeFrame.ToString()}'");
-            };
-        }
-
-        /// <summary>
-        /// Последняя возможно существующая дата котировки на текущий момент
-        /// </summary>
-        /// <param name="timeFrame"></param>
-        /// <returns></returns>
-        public static DateTime GetPossibleEndDate(TimeFrameEnum timeFrame)
-        {
-            var now = DateTime.Now;
-
-            switch (timeFrame)
-            {
-                case TimeFrameEnum.tick: return now;
-                case TimeFrameEnum.min1: return new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, 59).AddMinutes(-1);
-                case TimeFrameEnum.min4: throw new NotImplementedException();//  return now;
-                case TimeFrameEnum.H1: return new DateTime(now.Year, now.Month, now.Day, now.Hour, 59, 59).AddHours(-1);
-                case TimeFrameEnum.D1: return new DateTime(now.Year, now.Month, now.Day, 23, 59, 59).AddDays(-1);
-                case TimeFrameEnum.W1: throw new NotImplementedException();//  return new DateTime(now.Year, now.Month, now.Day, now.Hour, 59, 59).AddHours(-1);
-                case TimeFrameEnum.M1: return new DateTime(now.Year, now.Month, 28, 23, 59, 59).AddMonths(-1);
-                case TimeFrameEnum.Y1: return new DateTime(now.Year, 12, 31, 23, 59, 59).AddYears(-1);
 
                 default: throw new InvalidOperationException($"Неизвестный таймфрейм - '{timeFrame.ToString()}'");
             };
@@ -122,7 +99,7 @@ namespace QuotesService.BL.Static
         /// <returns></returns>
         public static List<QuoteModel> CorrectQuotes(QuotesCorrectRequest request)
         {
-            request.Quotes.ForEach(x => x.Date = CorrectDateByTF(x.Date, request.TimeFrame));
+            request.Quotes.ForEach(x => x.Date = DateTimeExtensions.CorrectDateByTF(x.Date, request.TimeFrame));
             return request.Quotes;
         }
 
@@ -135,25 +112,6 @@ namespace QuotesService.BL.Static
         public static bool IsReallyLastQuote(DateTime quoteDate, TimeFrameEnum timeFrame)
         {
             return !IsEssentialDifferentDates(DateTime.Now, quoteDate, timeFrame);
-        }
-
-        /// <summary>
-        /// Возвращает среднее значение между двумя датами
-        /// </summary>
-        /// <param name="dt1">Первая дата</param>
-        /// <param name="dt2">Вторая дата</param>
-        /// <returns></returns>
-        private static DateTime GetMedian(DateTime dt1, DateTime dt2)
-        {
-            if (dt1 == dt2)
-            {
-                return dt1;
-            }
-
-            var min = new DateTime(Math.Min(dt1.Ticks, dt2.Ticks));
-            var max = new DateTime(Math.Max(dt1.Ticks, dt2.Ticks));
-
-            return new DateTime(min.Ticks + (max.Ticks - min.Ticks) / 2);
         }
 
         /// <summary>
@@ -184,73 +142,7 @@ namespace QuotesService.BL.Static
             };
         }
 
-        /// <summary>
-        /// Приведение даты к единому формату - усреднение незначащих разрядов
-        /// </summary>
-        /// <param name="date"></param>
-        /// <param name="tf"></param>
-        /// <returns></returns>
-        private static DateTime CorrectDateByTF(DateTime date, TimeFrameEnum tf)
-        {
-            int year = date.Year, month = date.Month, day = date.Day, hour = date.Hour, min = date.Minute, sec = date.Second;
 
-            switch (tf)
-            {
-                case TimeFrameEnum.Y1: month = 6; day = 15; hour = 12; min = 0; sec = 0; break;
-                case TimeFrameEnum.Seasonly:
-                    {
-                        if (date.Month <= 6)
-                            month = date.Month <= 3 ? 2 : 5;
-                        else
-                            month = date.Month <= 9 ? 8 : 11;
 
-                        day = 15; hour = 12; min = 0; break;
-                    }
-                case TimeFrameEnum.M1: day = 15; hour = 12; min = 0; sec = 0; break;
-                case TimeFrameEnum.W1:
-                    {
-                        switch (date.DayOfWeek)
-                        {
-                            case DayOfWeek.Monday: date = date.AddDays(2); break;
-                            case DayOfWeek.Tuesday: date = date.AddDays(1); break;
-                            case DayOfWeek.Wednesday: date = date.AddDays(0); break;
-                            case DayOfWeek.Thursday: date = date.AddDays(-1); break;
-                            case DayOfWeek.Friday: date = date.AddDays(-2); break;
-                            case DayOfWeek.Saturday: date = date.AddDays(-3); break;
-                            case DayOfWeek.Sunday: date = date.AddDays(-4); break;
-                        }
-                        year = date.Year; month = date.Month; day = date.Day; hour = 12; min = 0; sec = 0; break;
-                    }
-                case TimeFrameEnum.D1: hour = 12; min = 0; sec = 0; break;
-                case TimeFrameEnum.H1: min = 30; sec = 0; break;
-                case TimeFrameEnum.min4: min = (int)Math.Floor((double)min / 4) * 4 + 2; sec = 0; break;
-                case TimeFrameEnum.min1: sec = 30; break;
-                case TimeFrameEnum.tick: break;
-
-                default: throw new InvalidOperationException($"Unknown timeframe - {tf.ToString()}");
-            }
-
-            return new DateTime(year, month, day, hour, min, sec);
-        }
-
-        public static int GetDifferenceBetweenDates(DateTime dt1, DateTime dt2, TimeFrameEnum tf)
-        {
-            var diff = new DateTime(Math.Max(dt1.Ticks, dt2.Ticks)) - new DateTime(Math.Min(dt1.Ticks, dt2.Ticks));
-
-            switch (tf)
-            {
-                case TimeFrameEnum.tick: return (int)diff.TotalSeconds;
-                case TimeFrameEnum.min1: return (int)diff.TotalMinutes;
-                case TimeFrameEnum.min4: return (int)(diff.TotalMinutes / 4);
-                case TimeFrameEnum.H1: return (int)diff.TotalHours;
-                case TimeFrameEnum.D1: return (int)diff.TotalDays;
-                case TimeFrameEnum.W1: return (int)(diff.TotalDays / 7);
-                case TimeFrameEnum.M1: return (int)(diff.TotalDays / 30);
-                case TimeFrameEnum.Seasonly: return (int)(diff.TotalDays / 120);
-                case TimeFrameEnum.Y1: return (int)(diff.TotalDays / 365.25);
-
-                default: throw new NotSupportedException($"Not supported timeframe '{tf}'");
-            }
-        }
     }
 }

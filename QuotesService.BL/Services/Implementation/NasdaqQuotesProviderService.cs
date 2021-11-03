@@ -16,6 +16,7 @@ using System.Globalization;
 using System.Net;
 using CommonLibraries.Graal.Enums;
 using CommonLibraries.Graal.Models;
+using CommonLibraries.Graal.Extensions;
 
 namespace QuotesService.BL.Services.Implementation
 {
@@ -52,7 +53,7 @@ namespace QuotesService.BL.Services.Implementation
             {
                 QuotesProvider = QuotesProviderType,
                 TickerMarketTimeFrame = request,
-                EndDate = AuxiliaryBL.GetPossibleEndDate(request.TimeFrame)
+                EndDate = DateTimeExtensions.GetPossibleEndDate(request.TimeFrame, DateTime.Now)
             };
 
             if (lastQuote != null)

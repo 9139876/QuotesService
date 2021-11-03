@@ -1,4 +1,5 @@
 ﻿using CommonLibraries.Graal.Enums;
+using CommonLibraries.Graal.Extensions;
 using CommonLibraries.Graal.Models;
 using QuotesService.Api.Enum;
 using QuotesService.Api.Models;
@@ -60,7 +61,7 @@ namespace QuotesService.BL.Services.Implementation
             if (lastQuote != null)
             {
                 getQuotesRequest.StartDate = lastQuote.Date;
-                getQuotesRequest.EndDate = AuxiliaryBL.GetPossibleEndDate(request.TimeFrame);
+                getQuotesRequest.EndDate = DateTimeExtensions.GetPossibleEndDate(request.TimeFrame, DateTime.Now);
             }
             else
             {

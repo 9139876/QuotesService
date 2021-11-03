@@ -24,6 +24,35 @@ namespace QuotesService.DAL.Repositories.Implementation
             return await DbSet.ToListAsync();
         }
 
+        public async Task<List<TickerAndMarket>> GetAllTickersAndMarkets(GetAllTickersAndMarketsRequest request)
+        {
+            var query = from tickers in _dbcontext.Tickers
+                        join markets in _dbcontext.Markets on tickers.MarketId equals markets.Id
+                        select new { tickers, markets };
+
+            if (request.AllowedMarketsNames?.Any() == true)
+            {
+                query = query.Where(x => request.AllowedMarketsNames.Contains(x.markets.Name));
+            }
+
+            if (request.AllowedTickersNames?.Any() == true)
+            {
+                query = query.Where(x => request.AllowedTickersNames.Contains(x.tickers.Name));
+            }
+
+            if (request.AllowedQuotesProviderTypes?.Any() == true)
+            {
+                query = query.Where(x => x.tickers.QuotesProviderType.HasValue && request.AllowedQuotesProviderTypes.Contains(x.tickers.QuotesProviderType.Value));
+            }
+
+            return (await query.ToListAsync())
+                .Select(x => new TickerAndMarket()
+                {
+                    MarketName = x.markets.Name,
+                    TickerName = x.tickers.Name
+                }).ToList();
+        }
+
         public async Task<TickerEntity> GetByTickerAndMarket(TickerAndMarket request)
         {
             var query = from tickers in _dbcontext.Tickers

@@ -1,4 +1,5 @@
 ﻿using CommonLibraries.Graal.Enums;
+using CommonLibraries.Graal.Extensions;
 using CommonLibraries.Graal.Models;
 using QuotesService.Api.Enum;
 using QuotesService.Api.Models;
@@ -244,7 +245,7 @@ namespace QuotesService.BL.Services.Implementation
 
         private static string GetOutputSize(DateTime? dateFrom, TimeFrameEnum timeFrame)
         {
-            if (AuxiliaryBL.GetDifferenceBetweenDates(dateFrom ?? DateTime.MinValue, DateTime.Now, timeFrame) < _compactSizeQuotesCount)
+            if (DateTimeExtensions.DatesDifferent(dateFrom ?? DateTime.MinValue, DateTime.Now, timeFrame) < _compactSizeQuotesCount)
             {
                 return "compact";
             }
