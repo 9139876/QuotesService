@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
-using QuotesService.Api.Models;
+using CommonLibraries.Graal.Models;
 
 namespace QuotesService.DAL.Repositories.Implementation
 {

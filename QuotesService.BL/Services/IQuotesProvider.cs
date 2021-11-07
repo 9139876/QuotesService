@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using CommonLibraries.Core.Models;
 using CommonLibraries.Graal.Enums;
 using QuotesService.Api.Models.RequestResponse;
 using QuotesService.BL.Models;

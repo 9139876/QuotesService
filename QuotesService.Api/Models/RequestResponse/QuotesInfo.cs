@@ -1,5 +1,4 @@
-﻿using QuotesService.Api.Enum;
-using System;
+﻿using System.Text;
 
 namespace QuotesService.Api.Models.RequestResponse
 {
@@ -20,5 +19,18 @@ namespace QuotesService.Api.Models.RequestResponse
         public string MaxPrice { get; set; }
 
         public string MaxPriceDate { get; set; }
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder(200);
+            sb.AppendLine($"Таймфрейм: {TimeFrameName}");
+            sb.AppendLine($"Всего котировок: {QuotesCount}");
+            sb.AppendLine($"Дата первой котировки: {FirstDate}");
+            sb.AppendLine($"Дата последней котировки: {LastDate}");
+            sb.AppendLine($"Минимальная цена: {MinPrice} от {MinPriceDate}");
+            sb.AppendLine($"Максимальная цена: {MaxPrice} от {MaxPriceDate}");
+
+            return sb.ToString();
+        }
     }
 }

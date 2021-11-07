@@ -1,8 +1,5 @@
-﻿using QuotesService.Api.Models.RequestResponse;
-using System;
+﻿using CommonLibraries.Core.Models;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace QuotesService.WebApp.Models
 {

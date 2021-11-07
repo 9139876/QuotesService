@@ -1,5 +1,5 @@
 ﻿using CommonLibraries.EF;
-using QuotesService.Api.Models;
+using CommonLibraries.Graal.Models;
 using QuotesService.Api.Models.RequestResponse;
 using QuotesService.DAL.Entities;
 using System.Collections.Generic;

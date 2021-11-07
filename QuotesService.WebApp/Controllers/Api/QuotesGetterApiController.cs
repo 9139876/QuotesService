@@ -1,8 +1,9 @@
 ﻿using CommonLibraries.Core.Extensions;
+using CommonLibraries.Core.Models;
 using CommonLibraries.Graal.Enums;
+using CommonLibraries.Graal.Models;
 using Microsoft.AspNetCore.Mvc;
 using QuotesService.Api.Enum;
-using QuotesService.Api.Models;
 using QuotesService.Api.Models.RequestResponse;
 using QuotesService.Api.Services;
 using QuotesService.BL.Models;

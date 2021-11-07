@@ -6,8 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommonLibraries.Core" Version="1.0.4" />
-    <PackageReference Include="CommonLibraries.Graal" Version="1.0.2" />
+    <PackageReference Include="CommonLibraries.Core" Version="1.0.5" />
+    <PackageReference Include="CommonLibraries.Graal" Version="1.0.4" />
     <PackageReference Include="CommonLibraries.RemoteCall" Version="1.0.6" />
   </ItemGroup>
 

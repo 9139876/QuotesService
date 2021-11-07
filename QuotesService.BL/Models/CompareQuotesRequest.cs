@@ -1,5 +1,5 @@
 ﻿using CommonLibraries.Graal.Enums;
-using QuotesService.Api.Models;
+using CommonLibraries.Graal.Models;
 
 namespace QuotesService.BL.Models
 {

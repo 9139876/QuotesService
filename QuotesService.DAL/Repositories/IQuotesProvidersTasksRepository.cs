@@ -1,7 +1,7 @@
 ﻿using CommonLibraries.EF;
 using CommonLibraries.Graal.Enums;
+using CommonLibraries.Graal.Models;
 using QuotesService.Api.Enum;
-using QuotesService.Api.Models;
 using QuotesService.DAL.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;

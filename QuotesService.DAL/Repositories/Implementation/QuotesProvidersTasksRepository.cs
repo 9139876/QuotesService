@@ -1,5 +1,6 @@
 ﻿using CommonLibraries.EF.Implementation;
 using CommonLibraries.Graal.Enums;
+using CommonLibraries.Graal.Models;
 using Microsoft.EntityFrameworkCore;
 using QuotesService.Api.Enum;
 using QuotesService.Api.Models;

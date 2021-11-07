@@ -1,12 +1,11 @@
 ﻿using CommonLibraries.Core.Extensions;
+using CommonLibraries.Core.Models;
+using CommonLibraries.Graal.Models;
 using Microsoft.AspNetCore.Mvc;
-using QuotesService.Api.Models;
-using QuotesService.Api.Models.RequestResponse;
 using QuotesService.DAL.Entities;
 using QuotesService.DAL.Internal;
 using QuotesService.DAL.Repositories;
 using QuotesService.WebApp.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -115,7 +114,7 @@ namespace QuotesService.WebApp.Controllers.Api
 
             var changedTasks = new List<QuotesProviderTaskEntity>();
 
-            foreach(var task in tasks)
+            foreach (var task in tasks)
             {
                 var serialize = task.Value.Serialize();
 
@@ -126,7 +125,7 @@ namespace QuotesService.WebApp.Controllers.Api
                     task.Value.IsActive = newValue.IsActive;
                     task.Value.UpdatePeriodInSecond = newValue.UpdatePeriodInSecond;
 
-                    if(task.Value.Serialize() != serialize)
+                    if (task.Value.Serialize() != serialize)
                     {
                         changedTasks.Add(task.Value);
                     }
@@ -137,7 +136,7 @@ namespace QuotesService.WebApp.Controllers.Api
             {
                 using (var transaction = _quotesDbContext.BeginTransaction())
                 {
-                    foreach(var task in changedTasks)
+                    foreach (var task in changedTasks)
                     {
                         await _quotesProvidersTasksRepository.UpdateAsync(task);
                     }
